@@ -1,0 +1,12 @@
+disabled = false
+languageCode = "it"
+languageName = "Italiano"
+weight = 2
+title = "Terraformazione del Cloud"
+
+[params]
+  displayName = "IT"
+  isoCode = "it"
+  rtl = false
+  dateFormat = "2 January 2006"
+  description = "Il mio blog personale su self-hosting e tecnologia."

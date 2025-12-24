@@ -1,0 +1,15 @@
+services:
+  hugo:
+    image: hugomods/hugo:exts-non-root
+    container_name: hugo
+    command: server --bind=0.0.0.0 --buildDrafts --buildFuture --watch
+    volumes:
+      - ./:/src
+    ports:
+      - "1313:1313"
+    networks:
+      - frontend
+
+networks:
+  frontend:
+    external: true
