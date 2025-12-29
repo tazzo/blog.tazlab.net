@@ -7,7 +7,7 @@ title = 'Hugo Installation Details'
 This post describes the Hugo installation setup.
 
 ## Docker Compose Configuration
-![kub](images/kub.png)
+
 The Hugo site is set up using Docker Compose. The `compose.yml` file defines a service named `hugo` which uses the `hugomods/hugo:exts-non-root` Docker image. This image includes the extended version of Hugo and runs as a non-root user, enhancing security and providing essential features for a modern Hugo site.
 
 The `compose.yml` also maps the local project directory to `/src` inside the container, allowing Hugo to serve content from the local files. Port `1313` is exposed to access the development server.
