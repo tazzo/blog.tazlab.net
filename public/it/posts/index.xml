@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on Terraformazione del Cloud</title>
+    <link>http://localhost:1313/it/posts/</link>
+    <description>Recent content in Posts on Terraformazione del Cloud</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>it</language>
+    <copyright>© 2025 </copyright>
+    <lastBuildDate>Sun, 21 Dec 2025 23:07:21 +0000</lastBuildDate><atom:link href="http://localhost:1313/it/posts/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Dettagli sull&#39;installazione di Hugo</title>
+      <link>http://localhost:1313/it/posts/hugo-installation-details/</link>
+      <pubDate>Sun, 21 Dec 2025 23:07:21 +0000</pubDate>
+      
+      <guid>http://localhost:1313/it/posts/hugo-installation-details/</guid>
+      <description></description>
+      
+    </item>
+    
+  </channel>
+</rss>
