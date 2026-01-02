@@ -4,4 +4,4 @@
 # File e cartelle di Obsidian da ignorare
 .obsidian/
 
-./public/
+public/
