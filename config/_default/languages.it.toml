@@ -1,4 +1,3 @@
-disabled = false
 languageCode = "it"
 languageName = "Italiano"
 weight = 2
@@ -10,3 +9,12 @@ title = "Terraformazione del Cloud"
   rtl = false
   dateFormat = "2 January 2006"
   description = "Il mio blog personale su self-hosting e tecnologia."
+
+[params.author]
+  name = "Roberto Tazzoli"
+  image = "img/profile.jpg"
+  headline = "Platform Engineer & Appassionato di Kubernetes"
+  bio = "Appassionato di infrastrutture dichiarative, self-hosting e Kubernetes."
+  links = [
+    { github = "https://github.com/tazzo" }
+  ]
