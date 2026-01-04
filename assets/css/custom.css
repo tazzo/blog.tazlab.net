@@ -1,0 +1,5 @@
+/* Dimensioni logo header */
+.logo {
+    max-height: 3rem !important;
+    width: auto !important;
+}
