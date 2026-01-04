@@ -7,6 +7,7 @@ title = "Terraforming the Cloud"
   displayName = "EN"
   isoCode = "en"
   rtl = false
+  logo = "img/logo.png"
   dateFormat = "2 January 2006"
   description = "My personal blog about self-hosting and technology."
 
