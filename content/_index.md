@@ -1,4 +1,4 @@
 ---
 title: "Roberto Tazzoli"
-description: "Platform Engineer & Kubernetes Enthusiast"
+description: "Homelab Platform Engineer & Kubernetes Enthusiast"
 ---

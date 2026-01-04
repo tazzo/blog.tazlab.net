@@ -13,7 +13,7 @@ title = "Terraforming the Cloud"
 [params.author]
   name = "Roberto Tazzoli"
   image = "img/profile.jpg"
-  headline = "Platform Engineer & Kubernetes Enthusiast"
+  headline = "Homelab Platform Engineer & Kubernetes Enthusiast"
   bio = "Passionate about declarative infrastructure, self-hosting, and Kubernetes."
   links = [
     { github = "https://github.com/tazzo" }
