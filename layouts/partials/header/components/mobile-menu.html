@@ -24,15 +24,16 @@
       </label>
       <nav class="mx-auto max-w-md space-y-6">
         
-        <!-- Icone Ricerca e Tema spostate qui -->
-        <div class="flex justify-around py-4 border-b bf-border-color">
+        <!-- Icone Ricerca e Tema su righe separate -->
+        <div class="flex flex-col gap-4 py-4 border-b bf-border-color">
           {{ if .Site.Params.enableSearch | default false }}
             <button
               id="search-button-mobile"
               aria-label="Search"
-              class="flex items-center justify-center bf-icon-color-hover text-2xl"
+              class="flex items-center gap-4 bf-icon-color-hover text-2xl px-2"
               title="{{ i18n "search.open_button_title" }}">
               {{ partial "icon.html" "search" }}
+              <span class="text-xl font-medium">{{ i18n "search.open_button_title" }}</span>
             </button>
           {{ end }}
 
@@ -41,12 +42,16 @@
               id="appearance-switcher-mobile"
               type="button"
               aria-label="Dark mode switcher"
-              class="flex items-center justify-center text-neutral-900 hover:text-primary-600 dark:text-neutral-200 dark:hover:text-primary-400 text-2xl">
-              <div class="dark:hidden">
+              class="flex items-center gap-4 text-neutral-900 hover:text-primary-600 dark:text-neutral-200 dark:hover:text-primary-400 text-2xl px-2">
+              <div class="dark:hidden flex items-center gap-4">
                 {{ partial "icon.html" "moon" }}
+                <span class="text-xl font-medium">{{ i18n "footer.appearance_dark" }}</span>
               </div>
               <div class="hidden dark:block">
-                {{ partial "icon.html" "sun" }}
+                <div class="flex items-center gap-4">
+                  {{ partial "icon.html" "sun" }}
+                  <span class="text-xl font-medium">{{ i18n "footer.appearance_light" }}</span>
+                </div>
               </div>
             </button>
           {{ end }}
