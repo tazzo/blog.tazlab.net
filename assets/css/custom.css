@@ -3,3 +3,10 @@
     max-height: 3rem !important;
     width: auto !important;
 }
+
+/* FIX MOBILE: Logo leggermente più piccolo per far stare il titolo */
+@media screen and (max-width: 768px) {
+    .logo {
+        max-height: 2.2rem !important;
+    }
+}
