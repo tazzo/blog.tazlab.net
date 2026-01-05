@@ -1,10 +1,12 @@
-# Lab Chronicles: The Odyssey of Native VIP on Talos and Bare-Metal Traefik Ingress
-
-**Date:** December 30, 2025  
-**Author:** Taz (DevOps Engineer)  
-**Status:** Mission Accomplished
-
----
++++
+title = "Lab Chronicles: Native VIP on Talos and Traefik Ingress"
+date = 2025-12-30T10:00:00Z
+draft = false
+description = "A technical chronicle of configuring a native Virtual IP on Talos Linux and setting up Traefik Ingress."
+tags = ["kubernetes", "talos-linux", "traefik", "homelab", "networking"]
+categories = ["infrastructure", "devops"]
+author = "Tazzo"
++++
 
 ## Introduction: The (Apparent) Charm of Simplicity
 
