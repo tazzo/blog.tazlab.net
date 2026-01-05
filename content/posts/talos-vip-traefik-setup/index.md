@@ -162,5 +162,3 @@ The result is a lean cluster, without resource waste, perfect for a Homelab, but
 
 **Next steps:** Configure certificate backups (because now they are on a single node!) and start deploying real services.
 
----
-*Generated via Gemini CLI*

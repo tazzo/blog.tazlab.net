@@ -161,6 +161,3 @@ Che "semplice" non significa "facile". Rimuovere strati di astrazione (come i Lo
 Il risultato è un cluster snello, senza sprechi di risorse, perfetto per un Homelab, ma costruito con la consapevolezza di ogni singolo ingranaggio.
 
 **Prossimi passi:** Configurare i backup dei certificati (perché ora sono su un solo nodo!) e iniziare a distribuire i servizi reali.
-
----
-*Generato tramite Gemini CLI*
