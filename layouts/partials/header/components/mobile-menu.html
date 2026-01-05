@@ -33,7 +33,7 @@
               class="flex items-center gap-4 bf-icon-color-hover text-2xl px-2"
               title="{{ i18n "search.open_button_title" }}">
               {{ partial "icon.html" "search" }}
-              <span class="text-xl font-medium">{{ i18n "search.open_button_title" }}</span>
+              <span class="text-xl font-medium">{{ i18n "search.input_placeholder" }}</span>
             </button>
           {{ end }}
 
@@ -45,12 +45,12 @@
               class="flex items-center gap-4 text-neutral-900 hover:text-primary-600 dark:text-neutral-200 dark:hover:text-primary-400 text-2xl px-2">
               <div class="dark:hidden flex items-center gap-4">
                 {{ partial "icon.html" "moon" }}
-                <span class="text-xl font-medium">{{ i18n "footer.appearance_dark" }}</span>
+                <span class="text-xl font-medium">Dark Mode</span>
               </div>
               <div class="hidden dark:block">
                 <div class="flex items-center gap-4">
                   {{ partial "icon.html" "sun" }}
-                  <span class="text-xl font-medium">{{ i18n "footer.appearance_light" }}</span>
+                  <span class="text-xl font-medium">Light Mode</span>
                 </div>
               </div>
             </button>
