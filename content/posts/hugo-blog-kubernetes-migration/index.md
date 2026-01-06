@@ -15,6 +15,8 @@ On paper, it's a five-minute operation. Take the `compose.yml`, translate it int
 
 This is not a "copy-paste" guide. It is the chronicle of how we dissected the problem, analyzed the failures, and built a resilient solution.
 
+**Yes, the blog you are reading right now runs on Kubernetes, self-hosted on Proxmox on my home mini PC!**
+
 ---
 
 ## Phase 1: The Storage Paradox

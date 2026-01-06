@@ -15,6 +15,8 @@ Sulla carta, è un'operazione da cinque minuti. Prendi il `compose.yml`, lo trad
 
 Questa non è una guida "copia-incolla". È la cronaca di come abbiamo sezionato il problema, analizzato i fallimenti e costruito una soluzione resiliente.
 
+**Ebbene sì, il blog che state leggendo ora gira su Kubernetes in self-hosting su Proxmox sul mio mini PC di casa!**
+
 ---
 
 ## Fase 1: Il Paradosso dello Storage
