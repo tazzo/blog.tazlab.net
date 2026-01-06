@@ -1,6 +1,6 @@
 +++
 title = "Cronache del Lab: Costruire la Persistenza con Longhorn e Talos"
-date = 2026-01-05T10:00:00Z
+date = 2026-01-02T10:00:00Z
 draft = false
 description = "Una cronaca tecnica dell'implementazione dello storage distribuito Longhorn su nodi immutabili Talos Linux."
 tags = ["kubernetes", "longhorn", "storage", "talos-linux", "homelab"]
