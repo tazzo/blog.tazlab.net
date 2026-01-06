@@ -4,9 +4,39 @@
     width: auto !important;
 }
 
-/* FIX MOBILE: Logo leggermente più piccolo per far stare il titolo */
-@media screen and (max-width: 768px) {
-    .logo {
-        max-height: 2.2rem !important;
-    }
+/* --- MIGLIORAMENTI TABLE OF CONTENTS (ToC) --- */
+
+/* Contenitore ToC laterale */
+.toc-right {
+    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+    font-size: 0.85rem !important;
+    line-height: 1.4 !important;
+    color: #64748b; /* Colore più tenue (Slate-500) */
+}
+
+/* Stile dei link della ToC */
+#TableOfContents a {
+    @apply transition-colors duration-200 block py-1;
+    text-decoration: none !important;
+}
+
+#TableOfContents a:hover {
+    color: #3b82f6 !important; /* Colore primario su hover */
+}
+
+/* Stile del link ATTIVO (SmartTOC) */
+#TableOfContents a.active {
+    color: #3b82f6 !important;
+    font-weight: 600 !important;
+}
+
+/* Rimuoviamo i punti elenco standard e aggiungiamo indentazione pulita */
+#TableOfContents ul {
+    list-style: none !important;
+    padding-left: 0.75rem !important;
+}
+
+#TableOfContents > ul {
+    padding-left: 0 !important;
+    border-left: none !important;
 }

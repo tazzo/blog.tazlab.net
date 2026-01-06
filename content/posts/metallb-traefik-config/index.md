@@ -1,6 +1,6 @@
 +++
 title = "From HostNetwork Chaos to MetalLB Elegance"
-date = 2026-01-02T10:00:00Z
+date = 2026-01-06T00:19:49Z
 draft = false
 description = "Transitioning from hostNetwork to a proper LoadBalancer with MetalLB in a bare-metal Kubernetes cluster."
 tags = ["kubernetes", "metallb", "traefik", "networking", "homelab"]
