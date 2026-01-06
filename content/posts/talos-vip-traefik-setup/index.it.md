@@ -4,7 +4,6 @@ date = 2025-12-30T10:00:00Z
 draft = false
 description = "Una cronaca tecnica della configurazione di un Virtual IP nativo su Talos Linux e l'impostazione di Traefik Ingress."
 tags = ["kubernetes", "talos-linux", "traefik", "homelab", "networking"]
-categories = ["infrastruttura", "devops"]
 author = "Tazzo"
 +++
 

@@ -4,7 +4,6 @@ date = 2026-01-06T00:42:51Z
 draft = false
 description = "Una cronaca tecnica della migrazione di un blog Hugo da Docker Compose a un cluster Kubernetes con Longhorn e Traefik."
 tags = ["kubernetes", "hugo", "migrazione", "longhorn", "traefik", "homelab"]
-categories = ["infrastruttura", "devops"]
 author = "Tazzo"
 +++
 

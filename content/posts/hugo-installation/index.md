@@ -4,7 +4,6 @@ date = 2025-12-21T23:07:21Z
 draft = false
 description = "Setup details for installing Hugo using Docker Compose and configuring the Blowfish theme."
 tags = ["hugo", "docker", "docker-compose", "blog", "web-development"]
-categories = ["web-development", "devops"]
 author = "Tazzo"
 +++
 

@@ -4,7 +4,6 @@ date = 2026-01-02T10:00:00Z
 draft = false
 description = "Una cronaca tecnica dell'implementazione dello storage distribuito Longhorn su nodi immutabili Talos Linux."
 tags = ["kubernetes", "longhorn", "storage", "talos-linux", "homelab"]
-categories = ["infrastruttura", "storage"]
 author = "Tazzo"
 +++
 

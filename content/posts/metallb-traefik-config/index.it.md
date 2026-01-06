@@ -4,7 +4,6 @@ date = 2026-01-04T10:00:00Z
 draft = false
 description = "Transizione da hostNetwork a un vero LoadBalancer con MetalLB in un cluster Kubernetes bare-metal."
 tags = ["kubernetes", "metallb", "traefik", "networking", "homelab"]
-categories = ["infrastruttura", "networking"]
 author = "Tazzo"
 +++
 
