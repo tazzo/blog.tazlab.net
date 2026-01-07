@@ -7,6 +7,7 @@
 
 colorScheme = "blowfish"
 mainSections = ["posts"]
+Logo = "img/logo.png"
 defaultAppearance = "dark"
 defaultBackgroundImage = "background.jpg" # SFONDO GLOBALE
 
