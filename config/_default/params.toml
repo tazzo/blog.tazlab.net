@@ -6,6 +6,7 @@
 # https://blowfish.page/docs/configuration/#theme-parameters
 
 colorScheme = "blowfish"
+mainSections = ["posts"]
 defaultAppearance = "dark"
 defaultBackgroundImage = "background.jpg" # SFONDO GLOBALE
 
@@ -21,7 +22,7 @@ enableStructuredBreadcrumbs = true
 
 replyByEmail = false
 
-mainSections = ["posts"]
+
 # robots = ""
 
 disableImageOptimization = false
