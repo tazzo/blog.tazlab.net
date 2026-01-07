@@ -4,41 +4,25 @@
     {{ $logo_gif := resources.Get "img/logo.gif" }}
     {{ if $logo }}
       <div>
-        <a href="{{ "" | relLangURL }}" class="flex group">
+        <a href="{{ "" | relLangURL }}" class="flex logo-container relative">
           <span class="sr-only">{{ .Site.Title | markdownify }}</span>
-          {{ if eq $logo.MediaType.SubType "svg" }}
-            <span class="logo object-scale-down object-left nozoom">
-              {{ $logo.Content | safeHTML }}
-            </span>
-          {{ else }}
-            <div class="relative">
-              <!-- Ghost Image: Invisible, solely to set the container dimensions correctly -->
-              <img
-                src="{{ $logo.RelPermalink }}"
-                width="{{ div $logo.Width 2 }}"
-                height="{{ div $logo.Height 2 }}"
-                class="logo max-h-20 max-w-20 object-scale-down object-left nozoom invisible opacity-0"
-                aria-hidden="true"
-                alt="">
-
-              <!-- Static Logo: Absolute position, fades out on hover -->
-              <img
-                src="{{ $logo.RelPermalink }}"
-                width="{{ div $logo.Width 2 }}"
-                height="{{ div $logo.Height 2 }}"
-                class="logo absolute top-0 left-0 max-h-20 max-w-20 object-scale-down object-left nozoom bg-transparent transition-opacity duration-300 ease-in-out opacity-100 group-hover:opacity-0"
-                alt="">
-              
-              {{ if $logo_gif }}
-              <!-- Animated GIF: Absolute position, fades in on hover -->
-              <img
-                src="{{ $logo_gif.RelPermalink }}"
-                width="{{ div $logo_gif.Width 2 }}"
-                height="{{ div $logo_gif.Height 2 }}"
-                class="logo absolute top-0 left-0 max-h-20 max-w-20 object-scale-down object-left nozoom bg-transparent transition-opacity duration-300 ease-in-out opacity-0 group-hover:opacity-100"
-                alt="">
-              {{ end }}
-            </div>
+          
+          <!-- Static Logo -->
+          <img
+            src="{{ $logo.RelPermalink }}"
+            width="{{ div $logo.Width 2 }}"
+            height="{{ div $logo.Height 2 }}"
+            class="logo-static object-scale-down object-left nozoom"
+            alt="Logo">
+            
+          {{ if $logo_gif }}
+          <!-- Animated GIF -->
+          <img
+            src="{{ $logo_gif.RelPermalink }}"
+            width="{{ div $logo_gif.Width 2 }}"
+            height="{{ div $logo_gif.Height 2 }}"
+            class="logo-anim absolute top-0 left-0 object-scale-down object-left nozoom"
+            alt="Logo Animated">
           {{ end }}
         </a>
       </div>

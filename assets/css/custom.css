@@ -1,7 +1,27 @@
 /* Dimensioni logo header */
-.logo {
+.logo, .logo-static, .logo-anim {
     max-height: 3rem !important;
     width: auto !important;
+    background-color: transparent !important;
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* Stato iniziale */
+.logo-static {
+    opacity: 1;
+}
+
+.logo-anim {
+    opacity: 0;
+}
+
+/* Effetto Hover sul contenitore */
+.logo-container:hover .logo-static {
+    opacity: 0 !important;
+}
+
+.logo-container:hover .logo-anim {
+    opacity: 1 !important;
 }
 
 /* --- MIGLIORAMENTI TABLE OF CONTENTS (ToC) --- */
