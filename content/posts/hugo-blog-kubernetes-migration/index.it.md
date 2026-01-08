@@ -7,7 +7,7 @@ tags = ["kubernetes", "hugo", "migrazione", "longhorn", "traefik", "homelab"]
 author = "Tazzo"
 +++
 
-## Introduzione: L'Illusione della Semplicezza
+## Introduzione: L'Illusione della Semplicitá
 
 Oggi l'obiettivo sembrava banale: prendere un blog statico generato con **Hugo**, che attualmente gira pacificamente in un container Docker gestito tramite Compose, e spostarlo all'interno del cluster Kubernetes.
 
