@@ -24,6 +24,30 @@
     opacity: 1 !important;
 }
 
+/* --- STILE TITOLO SITO --- */
+@import url('https://fonts.googleapis.com/css2?family=Saira+Stencil+One&display=swap');
+
+a.site-title {
+    font-family: 'Saira Stencil One', cursive !important;
+    font-weight: 400 !important;
+    font-style: normal !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    color: #ffffff !important;
+    text-shadow: 0 0 8px rgba(59, 130, 246, 0.6) !important;
+}
+
+.site-title:hover {
+    color: #3b82f6 !important;
+    text-shadow: 0 0 12px rgba(59, 130, 246, 0.8) !important;
+}
+
+@media (min-width: 1024px) {
+    .site-title {
+        font-size: 2.2rem !important;
+    }
+}
+
 /* --- MIGLIORAMENTI TABLE OF CONTENTS (ToC) --- */
 
 /* Contenitore ToC laterale */

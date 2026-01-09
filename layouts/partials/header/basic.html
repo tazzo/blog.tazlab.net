@@ -29,7 +29,7 @@
     {{ end }}
   {{ end }}
   {{ if not .Site.Params.disableTextInHeader | default true }}
-    <a href="{{ "" | relLangURL }}" class="text-base font-medium truncate min-w-0 shrink">
+    <a href="{{ "" | relLangURL }}" class="site-title text-base font-medium truncate min-w-0 shrink">
       {{ .Site.Title | markdownify }}
     </a>
   {{ end }}
