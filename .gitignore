@@ -1,7 +1,8 @@
 # .gitignore nella root del tuo progetto Hugo
 .hugo_build.lock
 .DS_Store
+resources/
+public/
+
 # File e cartelle di Obsidian da ignorare
 .obsidian/
-
-public/
