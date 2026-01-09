@@ -31,7 +31,7 @@ a.site-title {
     font-family: 'Saira Stencil One', cursive !important;
     font-weight: 400 !important;
     font-style: normal !important;
-    font-size: 1.4rem !important; /* Ridotto su mobile */
+    font-size: 1.1rem !important; /* Ulteriormente ridotto per mobile */
     letter-spacing: 0.05em !important;
     color: #ffffff !important;
     text-shadow: 0 0 8px rgba(59, 130, 246, 0.6) !important;
