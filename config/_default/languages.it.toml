@@ -1,7 +1,7 @@
 languageCode = "it"
 languageName = "Italiano"
 weight = 2
-title = "Terraformazione del Cloud"
+title = "Terraforming the Cloud"
 
 [params]
   displayName = "IT"
