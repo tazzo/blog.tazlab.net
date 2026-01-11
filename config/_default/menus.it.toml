@@ -11,14 +11,29 @@
 # ordered by weight from lowest to highest.
 
 [[main]]
+  name = "Chi sono"
+  pageRef = "about"
+  weight = 5
+
+[[main]]
   name = "Blog"
   pageRef = "posts"
   weight = 10
 
 [[main]]
+  name = "Chi sono"
+  pageRef = "about"
+  weight = 5
+
+[[main]]
   name = "Guide"
   pageRef = "guides"
   weight = 20
+
+[[main]]
+  name = "Chi sono"
+  pageRef = "about"
+  weight = 5
 
 [[main]]
   name = "Tags"
