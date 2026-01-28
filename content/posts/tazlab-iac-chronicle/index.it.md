@@ -1,6 +1,6 @@
 +++
 title = "Dall’Artigianato all’Infrastruttura: Cronaca dell’Introduzione di Terraform in Tazlab"
-date = 2026-01-25T01:29:21+01:00
+date = 2026-01-24T01:29:21+01:00
 draft = false
 description = "Cronaca dell'introduzione di Terraform in Tazlab per la gestione del cluster Talos su Proxmox."
 tags = ["terraform", "proxmox", "iac", "kubernetes", "talos"]
