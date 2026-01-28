@@ -1,6 +1,6 @@
 ---
 title: "The Fortress Walls: Implementing Zero-Trust Security and Secret Management"
-date: 2026-01-29T22:00:00+01:00
+date: 2026-01-28T22:00:00+01:00
 draft: false
 tags: ["kubernetes", "security", "infisical", "terraform", "talos", "gitops", "devops", "external-secrets"]
 categories: ["Infrastructure", "Security"]
