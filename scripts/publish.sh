@@ -1,22 +1,47 @@
 #!/bin/bash
 set -e
 
-# --- BLOG PUBLISH SCRIPT ---
+# --- BLOG GITOPS PUBLISH SCRIPT (Level 2) ---
 
-# 1. Update submodules (Themes)
+# Paths
+K8S_REPO_PATH="../../tazlab-k8s"
+MANIFEST_PATH="$K8S_REPO_PATH/apps/base/hugo-blog/hugo-blog.yaml"
+
+# 1. Check for uncommitted changes in blog-src
+if ! git diff-index --quiet HEAD --; then
+    echo "❌ Error: You have uncommitted changes in blog-src. Please commit first."
+    exit 1
+fi
+
+# 2. Get the current Git SHA
+GIT_SHA=$(git rev-parse --short HEAD)
+IMAGE_TAG="blog-$GIT_SHA"
+IMAGE_NAME="tazzo/tazlab.net:$IMAGE_TAG"
+
+echo "🔖 Current Git SHA: $GIT_SHA"
+
+# 3. Update submodules (Themes)
 echo "🔄 Updating git submodules..."
 git submodule update --init --recursive
 
-# 2. Build the Docker image
-echo "🏗️ Building Docker image (tazzo/tazlab.net:blog)..."
-docker build -t tazzo/tazlab.net:blog .
+# 4. Build the Docker image
+echo "🏗️ Building Docker image ($IMAGE_NAME)..."
+docker build -t "$IMAGE_NAME" .
 
-# 3. Push to Docker Hub
+# 5. Push to Docker Hub
 echo "🚀 Pushing to Docker Hub..."
-docker push tazzo/tazlab.net:blog
+docker push "$IMAGE_NAME"
 
-# 4. Force Kubernetes to pull the new image
-echo "🔄 Restarting deployment in Kubernetes..."
-kubectl --kubeconfig /home/taz/kubernetes/ephemeral-castle/cluster-configs/blue-kubeconfig rollout restart deployment/hugo-blog -n hugo-blog
+# 6. Update the GitOps repository
+echo "📝 Updating image tag in $MANIFEST_PATH..."
+sed -i "s|image: tazzo/tazlab.net:blog-.*|image: $IMAGE_NAME|" "$MANIFEST_PATH"
 
-echo "✅ Blog published and updated in cluster successfully!"
+# 7. Commit and Push to tazlab-k8s
+echo "📦 Committing and pushing to tazlab-k8s..."
+cd "$K8S_REPO_PATH"
+git add apps/base/hugo-blog/hugo-blog.yaml
+git commit -m "chore(blog): update image to $IMAGE_TAG"
+git push
+
+echo "✅ Blog published and GitOps manifest updated!"
+echo "⏳ Flux will reconcile the changes in about 60 seconds."
