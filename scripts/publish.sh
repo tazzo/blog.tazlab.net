@@ -15,4 +15,8 @@ docker build -t tazzo/tazlab.net:blog .
 echo "🚀 Pushing to Docker Hub..."
 docker push tazzo/tazlab.net:blog
 
-echo "✅ Blog published successfully!"
+# 4. Force Kubernetes to pull the new image
+echo "🔄 Restarting deployment in Kubernetes..."
+kubectl --kubeconfig /home/taz/kubernetes/ephemeral-castle/cluster-configs/blue-kubeconfig rollout restart deployment/hugo-blog -n hugo-blog
+
+echo "✅ Blog published and updated in cluster successfully!"
