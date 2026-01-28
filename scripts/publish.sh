@@ -4,7 +4,8 @@ set -e
 # --- BLOG GITOPS PUBLISH SCRIPT (Level 2) ---
 
 # Paths
-K8S_REPO_PATH="../../tazlab-k8s"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+K8S_REPO_PATH="$SCRIPT_DIR/../../tazlab-k8s"
 MANIFEST_PATH="$K8S_REPO_PATH/apps/base/hugo-blog/hugo-blog.yaml"
 
 # 1. Check for uncommitted changes in blog-src
@@ -22,6 +23,7 @@ echo "🔖 Current Git SHA: $GIT_SHA"
 
 # 3. Update submodules (Themes)
 echo "🔄 Updating git submodules..."
+cd "$SCRIPT_DIR/.."
 git submodule update --init --recursive
 
 # 4. Build the Docker image
