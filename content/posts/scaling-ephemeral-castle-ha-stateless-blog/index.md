@@ -1,6 +1,6 @@
 ---
 title: "Rise of the Fortress: High Availability, Immutability, and the Birth of a Serious Cluster"
-date: 2026-01-30T12:45:00+01:00
+date: 2026-01-31T07:00:00+01:00
 draft: false
 tags: ["kubernetes", "ha", "gitops", "terraform", "traefik", "infisical", "nginx", "docker", "devops"]
 categories: ["Infrastructure", "Architecture"]

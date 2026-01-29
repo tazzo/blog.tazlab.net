@@ -1,6 +1,6 @@
 ---
 title: "L'Ascesa della Fortezza: Alta Affidabilità, Immutabilità e la Nascita del Cluster Serio"
-date: 2026-01-30T12:45:00+01:00
+date: 2026-01-31T07:00:00+01:00
 draft: false
 tags: ["kubernetes", "ha", "gitops", "terraform", "traefik", "infisical", "nginx", "docker", "devops"]
 categories: ["Infrastructure", "Architecture"]
