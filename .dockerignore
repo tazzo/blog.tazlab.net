@@ -1,0 +1,10 @@
+.git
+public
+resources
+tmp
+.hugo_build.lock
+docker-compose*
+*.md
+!content/**/*.md
+AGENTS.md
+SESSION_RESUME.md
