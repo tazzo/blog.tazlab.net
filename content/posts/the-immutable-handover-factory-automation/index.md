@@ -129,6 +129,26 @@ This drastically reduces the **Blast Radius** of a Terraform error: if you get a
 
 ---
 
+## The Factory in Action: How a New Project is Born
+
+Thanks to this restructuring, creating a new cluster is no longer a work of craftsmanship but a production line process. If I wanted to create the \"Green\" cluster today, the procedure would be as follows:
+
+1. **Provisioning (IaC)**:
+   - Copy the `templates/proxmox-talos` folder to `clusters/green/proxmox`.
+   - Modify the `terraform.tfvars` file by setting the new IPs, cluster name, and the new Infisical path (e.g., `/ephemeral-castle/green/proxmox`).
+   - Prepare the secrets on Infisical in the new folder.
+
+2. **Delivery (GitOps)**:
+   - Create a new GitHub repository starting from the contents of `gitops-template`.
+   - Enter the URL of this new repository in the `terraform.tfvars` file of the project folder.
+
+3. **Spark**:
+   - Run `./create.sh` from the project folder.
+
+In less than 10 minutes, Terraform would create the machines, and Flux would start populating the new repository with the base components (MetalLB, Traefik, Cert-Manager) already pre-configured. This is the true power of the Castle: the ability to scale horizontally not just nodes, but entire digital ecosystems.
+
+---
+
 ## Final Hardening: Kernel Cleanup and API v1
 
 To conclude the day, I addressed two \"cleanup\" bugs that were cluttering the logs.

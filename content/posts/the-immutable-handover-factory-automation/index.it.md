@@ -129,6 +129,26 @@ Questo riduce drasticamente il **Blast Radius** (raggio d'impatto) di un errore 
 
 ---
 
+## La Fabbrica in Azione: Come nasce un nuovo Progetto
+
+Grazie a questa ristrutturazione, creare un nuovo cluster non è più un'opera di artigianato, ma un processo di catena di montaggio. Se oggi volessi far nascere il cluster "Green", la procedura sarebbe questa:
+
+1. **Provisioning (IaC)**:
+   - Copio la cartella `templates/proxmox-talos` in `clusters/green/proxmox`.
+   - Modifico il file `terraform.tfvars` impostando i nuovi IP, il nome del cluster e il nuovo path di Infisical (es. `/ephemeral-castle/green/proxmox`).
+   - Preparo i segreti su Infisical nella nuova cartella.
+
+2. **Delivery (GitOps)**:
+   - Creo un nuovo repository su GitHub partendo dal contenuto di `gitops-template`.
+   - Inserisco l'URL di questo nuovo repository nel file `terraform.tfvars` della cartella del progetto.
+
+3. **Innesco**:
+   - Lancio `./create.sh` dalla cartella del progetto.
+
+In meno di 10 minuti, Terraform creerebbe le macchine e Flux inizierebbe a popolare il nuovo repository con i componenti di base (MetalLB, Traefik, Cert-Manager) già pre-configurati. Questo è il vero potere del Castello: la capacità di scalare orizzontalmente non solo i nodi, ma interi ecosistemi digitali.
+
+---
+
 ## Hardening Finale: Pulizia del Kernel e API v1
 
 Per concludere la giornata, ho affrontato due bug di "pulizia" che sporcavano i log.
