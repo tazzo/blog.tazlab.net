@@ -37,7 +37,7 @@ enableEmoji = true
   priority = 0.5
 
 [outputs]
-  home = ["HTML", "RSS", "JSON"]
+  home = ["HTML", "RSS", "JSON", "robots"]
 
 [related]
   threshold = 0
