@@ -1,6 +1,6 @@
 ---
 title: "The Foundations of Accessibility: Traefik, Cert-Manager, and the Castle's Philosophical Pivot"
-date: 2026-01-29T10:42:00+01:00
+date: 2026-01-30T10:42:00+01:00
 draft: false
 tags: ["kubernetes", "traefik", "cert-manager", "terraform", "devops", "security", "letsencrypt"]
 categories: ["Infrastructure", "Security"]
