@@ -1,6 +1,6 @@
 ---
 title: "The Immutable Handover: Terraform, Flux, and the Birth of the Castle Factory"
-date: 2026-01-01T07:00:00+01:00
+date: 2026-02-01T07:00:00+01:00
 draft: false
 tags: ["kubernetes", "terraform", "fluxcd", "gitops", "automation", "devops", "security", "infisical"]
 categories: ["Infrastructure", "Design Patterns"]

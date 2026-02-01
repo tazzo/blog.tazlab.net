@@ -1,6 +1,6 @@
 ---
 title: "Il Passaggio di Consegne: Terraform, Flux e la Nascita della Fabbrica di Castelli"
-date: 2026-01-01T07:00:00+01:00
+date: 2026-02-01T07:00:00+01:00
 draft: false
 tags: ["kubernetes", "terraform", "fluxcd", "gitops", "automation", "devops", "security", "infisical"]
 categories: ["Infrastructure", "Design Patterns"]
