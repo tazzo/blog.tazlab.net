@@ -1,6 +1,6 @@
 ---
 title: "L'Orchestra del Castello: Il Pivot verso Terragrunt e la Guerra alle Race Condition"
-date: 2026-02-02T06:00:00+01:00
+date: 2026-02-01T06:00:00+01:00
 draft: false
 tags: ["kubernetes", "terragrunt", "terraform", "fluxcd", "devops", "proxmox", "automation", "gitops"]
 categories: ["Infrastructure", "Design Patterns"]
