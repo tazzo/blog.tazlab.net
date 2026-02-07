@@ -1,12 +1,11 @@
 #!/bin/bash
 set -e
 
-# --- BLOG GITOPS PUBLISH SCRIPT (Level 2) ---
+# --- BLOG PUBLISH SCRIPT (Image Only) ---
 
 # Paths
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-K8S_REPO_PATH="$SCRIPT_DIR/../../tazlab-k8s"
-MANIFEST_PATH="$K8S_REPO_PATH/apps/base/hugo-blog/hugo-blog.yaml"
+cd "$SCRIPT_DIR/.."
 
 # 1. Check for uncommitted changes in blog-src
 if ! git diff-index --quiet HEAD --; then
@@ -23,7 +22,6 @@ echo "🔖 Current Git SHA: $GIT_SHA"
 
 # 3. Update submodules (Themes)
 echo "🔄 Updating git submodules..."
-cd "$SCRIPT_DIR/.."
 git submodule update --init --recursive
 
 # 4. Build the Docker image
@@ -34,16 +32,5 @@ docker build -t "$IMAGE_NAME" .
 echo "🚀 Pushing to Docker Hub..."
 docker push "$IMAGE_NAME"
 
-# 6. Update the GitOps repository
-echo "📝 Updating image tag in $MANIFEST_PATH..."
-sed -i "s|image: tazzo/tazlab.net:blog-.*|image: $IMAGE_NAME|" "$MANIFEST_PATH"
-
-# 7. Commit and Push to tazlab-k8s
-echo "📦 Committing and pushing to tazlab-k8s..."
-cd "$K8S_REPO_PATH"
-git add apps/base/hugo-blog/hugo-blog.yaml
-git commit -m "chore(blog): update image to $IMAGE_TAG"
-git push
-
-echo "✅ Blog published and GitOps manifest updated!"
-echo "⏳ Flux will reconcile the changes in about 60 seconds."
+echo "✅ Image $IMAGE_NAME published successfully!"
+echo "📡 Flux will detect the new image and update the cluster automatically."
