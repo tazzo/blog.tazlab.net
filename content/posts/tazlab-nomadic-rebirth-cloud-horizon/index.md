@@ -194,4 +194,4 @@ In this stage, we learned that:
 The Castle is now solid, portable, and, above all, aware of its own mortality. And it is precisely this awareness that makes it immortal.
 
 ---
-*Technical Chronicle by Taz - Senior DevOps Engineer at TazLab.*
+*Technical Chronicle by Taz - HomeLab DevOps Engineer.*
