@@ -1,0 +1,31 @@
+name: Publish Blog
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: "roberto.tazzoli@gmail.com"
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          # We use the SHA to match the tag Flux expects (blog-SHA)
+          tags: |
+            tazzo/tazlab.net:latest
+            tazzo/tazlab.net:blog-${{ github.sha }}
