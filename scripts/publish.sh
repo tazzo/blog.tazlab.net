@@ -54,10 +54,12 @@ EOF
 
 # 5. Build and Push with Kaniko
 echo "🏗️ Building and Pushing Docker image to Docker Hub ($IMAGE_NAME)..."
+# Using --force because we are running inside a container that is not the official kaniko image
 /usr/local/bin/kaniko \
     --context "$(pwd)" \
     --dockerfile "$(pwd)/Dockerfile" \
-    --destination "$IMAGE_NAME"
+    --destination "$IMAGE_NAME" \
+    --force
 
 echo "✅ Image $IMAGE_NAME published successfully to Docker Hub via Kaniko!"
 echo "📡 Flux will detect the new image and update the cluster automatically."
