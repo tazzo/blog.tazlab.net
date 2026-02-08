@@ -25,7 +25,6 @@ jobs:
         with:
           context: .
           push: true
-          # We use the SHA to match the tag Flux expects (blog-SHA)
           tags: |
-            tazzo/tazlab.net:latest
-            tazzo/tazlab.net:blog-${{ github.sha }}
+            tazzo/tazlab-blog:latest
+            tazzo/tazlab-blog:blog-${{ github.sha }}
