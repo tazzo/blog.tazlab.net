@@ -15,7 +15,7 @@ Nell'architettura del **Castello Effimero**, la resilienza non è un'opzione, ma
 Questa non è la storia di un successo immediato, ma la cronaca onesta di una guerra di logoramento contro gli automatismi dell'operatore Postgres di CrunchyData, le idiosincrasie dei percorsi degli oggetti S3 e la latenza fisica dello storage distribuito su hardware limitato.
 
 ---
-
+ 
 ## Il Mindset: L'Infrastruttura è Cenere, il Dato è Diamante
 
 Ho deciso di adottare una filosofia radicale: l'intero stato del cluster (VM, configurazioni OS, volumi locali) deve essere considerato sacrificabile. L'unico elemento che deve sopravvivere al "fuoco nucleare" è il backup criptato su S3. Per testare questa visione, ho dovuto affrontare tre scogli tecnici principali:

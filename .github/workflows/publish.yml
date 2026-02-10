@@ -27,4 +27,4 @@ jobs:
           push: true
           tags: |
             tazzo/tazlab-blog:latest
-            tazzo/tazlab-blog:blog-${{ github.sha }}
+            tazzo/tazlab-blog:blog-${{ github.run_number }}-${{ github.sha }}
