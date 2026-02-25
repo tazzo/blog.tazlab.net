@@ -2,7 +2,7 @@
 title: "Phoenix Protocol V2: Enterprise Security, Parallelism, and the 8-Minute Milestone"
 date: 2026-02-25T17:50:00+01:00
 draft: false
-tags: ["kubernetes", "devops", "security", "fluxcd", "automation", "terragrunt", "infisical", "reliability"]
+tags: ["kubernetes", "devops", "security", "zero-trust", "fluxcd", "automation", "terragrunt", "disaster-recovery", "reliability", "infisical"]
 categories: ["Infrastructure", "DevSecOps"]
 author: "Taz"
 description: "Evolution of the rebirth protocol: how I broke the 10-minute barrier by implementing ephemeral RAM secrets, turbo-parallelism, and granular component decomposition."

@@ -2,7 +2,7 @@
 title: "Phoenix Protocol: Validating Zero-Touch Rebirth and the S3 PITR Hell"
 date: 2026-02-10T18:30:00+01:00
 draft: false
-tags: ["kubernetes", "devops", "postgresql", "s3-backup", "pgbackrest", "longhorn", "disaster-recovery", "automation", "terragrunt"]
+tags: ["kubernetes", "devops", "security", "zero-trust", "postgresql", "s3-backup", "disaster-recovery", "automation", "terragrunt", "longhorn"]
 categories: ["Infrastructure", "Reliability Engineering"]
 author: "Taz"
 description: "Technical chronicle of extreme validation: testing data immortality through repeated cycles of total destruction (Nuclear Wipe) and automated rebirth, resolving S3 key injection conflicts and distributed storage latencies."
