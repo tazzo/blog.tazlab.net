@@ -1,6 +1,6 @@
 +++
 title = "AGENTS.ctx: Gestione Contesti per Agenti AI Senza Rispiegare Tutto da Capo"
-date = 2026-03-14T11:00:00+01:00
+date = 2026-03-13T21:00:00+01:00
 draft = false
 description = "Come ho risolto il problema dell'amnesia delle sessioni AI con un sistema di contesti organizzati: caricamento selettivo, agent-agnostic, e zero ripetizioni."
 tags = ["AI", "DevOps", "Context Management", "Agents", "Workflow", "Productivity"]

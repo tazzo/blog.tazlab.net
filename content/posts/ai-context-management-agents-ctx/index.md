@@ -1,6 +1,6 @@
 +++
 title = "AGENTS.ctx: Context Management for AI Agents Without Re-Explaining Everything"
-date = 2026-03-14T11:00:00+01:00
+date = 2026-03-13T21:00:00+01:00
 draft = false
 description = "How I solved the AI session amnesia problem with an organized context system: selective loading, agent-agnostic, and zero repetition."
 tags = ["AI", "DevOps", "Context Management", "Agents", "Workflow", "Productivity"]
