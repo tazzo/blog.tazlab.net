@@ -1,6 +1,6 @@
 ---
 title: "TazLab Roadmap: HashiCorp Vault and Oracle Cloud"
-date: 2026-03-17T14:00:00+00:00
+date: 2026-03-19T09:00:00+00:00
 draft: false
 tags: ["Kubernetes", "HashiCorp Vault", "Oracle Cloud", "Tailscale", "Security", "Secrets Management", "Talos OS", "GitOps"]
 description: "From Infisical to HashiCorp Vault, through a new cluster on Oracle Cloud and a Tailscale mesh VPN: the TazLab advanced security roadmap."
