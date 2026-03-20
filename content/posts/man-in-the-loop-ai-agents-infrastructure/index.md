@@ -1,6 +1,6 @@
 ---
 title: "Man in the Loop: Reflections on Using AI Agents to Build Infrastructure"
-date: 2026-03-18T14:00:00+00:00
+date: 2026-03-18T08:00:00+00:00
 draft: false
 tags: ["AI", "Kubernetes", "DevOps", "Cloud", "AI Agents", "pi.dev", "OpenRouter", "Workflow"]
 description: "Not hype, not science fiction: an honest account from someone who uses AI agents every day to build serious Kubernetes clusters, with all the limitations that entails."

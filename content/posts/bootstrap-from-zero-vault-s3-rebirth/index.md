@@ -1,7 +1,7 @@
 +++
 title = "Bootstrap from Zero: Rebuilding Everything from a Single S3 Bucket"
-date = 2026-03-21T13:00:00+00:00
-draft = true
+date = 2026-03-20T11:00:00+00:00
+draft = false
 tags = ["Kubernetes", "HashiCorp Vault", "Oracle Cloud", "Tailscale", "Security", "Secrets Management", "Talos OS", "S3", "Bootstrap", "Infisical", "Terragrunt"]
 description = "How I designed a complete rebirth cycle for TazLab: from a blank machine to a fully operational Kubernetes cluster using only an S3 bucket, a passphrase, and an MFA device."
 +++

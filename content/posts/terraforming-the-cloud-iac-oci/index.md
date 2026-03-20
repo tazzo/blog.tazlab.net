@@ -1,6 +1,6 @@
 +++
 title = "Terraforming the Cloud: My First IaC on OCI"
-date = 2026-03-19T05:00:00Z
+date = 2026-03-20T08:00:00+00:00
 draft = false
 description = "A detailed technical chronicle of provisioning a Kubernetes cluster on Oracle Cloud Infrastructure for the first time using Terraform, Terragrunt, and Talos Linux. From untested scaffolding challenges to managing custom ARM64 images."
 tags = ["terraform", "terragrunt", "oracle-cloud", "talos-linux", "kubernetes", "iac", "devops", "arm64", "infrastructure-as-code"]
