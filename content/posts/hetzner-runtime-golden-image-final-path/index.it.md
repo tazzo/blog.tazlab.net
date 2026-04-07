@@ -1,6 +1,6 @@
 +++
 title = "Golden Image runtime su Hetzner: il percorso fino alla versione finale"
-date = 2026-04-06T14:00:00+00:00
+date = 2026-04-07T12:38:03+00:00
 draft = false
 description = "Come ho portato a termine la mia prima pipeline completa per una golden image runtime su Hetzner, usando Ansible per la prima volta, con più cicli di validazione e una chiusura operativa pulita."
 tags = ["hetzner", "golden-image", "ansible", "devops", "automation", "infrastructure", "linux", "testing"]
