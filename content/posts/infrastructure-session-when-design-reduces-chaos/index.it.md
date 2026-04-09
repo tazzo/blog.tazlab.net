@@ -1,6 +1,6 @@
 +++
 title = "Una sessione infrastrutturale più tranquilla del solito: quando la progettazione riduce il caos"
-date = 2026-04-08T06:00:00+00:00
+date = 2026-04-09T06:00:00+00:00
 draft = false
 description = "Il diario tecnico del passo foundation su Hetzner con Tailscale: una build andata abbastanza liscia non per caso, ma grazie a ore di progettazione, scomposizione del problema e uso guidato degli LLM."
 tags = ["hetzner", "tailscale", "ansible", "terraform", "devops", "llm", "automation", "infrastructure", "architecture"]

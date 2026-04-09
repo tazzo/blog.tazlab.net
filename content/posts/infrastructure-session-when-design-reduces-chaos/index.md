@@ -1,6 +1,6 @@
 +++
 title = "A quieter infrastructure session than usual: when design reduces chaos"
-date = 2026-04-08T06:00:00+00:00
+date = 2026-04-09T06:00:00+00:00
 draft = false
 description = "The technical diary of the Hetzner foundation step with Tailscale: a build that went fairly smoothly not by chance, but thanks to hours of design work, problem decomposition, and guided use of LLMs."
 tags = ["hetzner", "tailscale", "ansible", "terraform", "devops", "llm", "automation", "infrastructure", "architecture"]
