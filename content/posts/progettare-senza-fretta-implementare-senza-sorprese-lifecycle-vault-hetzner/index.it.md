@@ -1,7 +1,7 @@
 +++
 title = "Progettare senza fretta, implementare senza sorprese: il lifecycle di Vault su Hetzner"
 date = 2026-04-11T14:00:00+00:00
-draft = false
+draft = true
 description = "L'evoluzione del metodo CRISP e la dimostrazione pratica del suo valore. Come tre giorni di design intensivo si sono tradotti in meno di due ore di implementazione perfetta del lifecycle di Vault su Hetzner."
 tags = ["hetzner", "vault", "podman", "tailscale", "ansible", "devops", "infrastructure", "crisp", "architecture"]
 categories = ["Infrastructure", "DevOps", "Architecture"]
