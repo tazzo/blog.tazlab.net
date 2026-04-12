@@ -1,7 +1,7 @@
 +++
 title = "Terraforming the Cloud: Provisioning and Configuring Vault on Hetzner via Terraform and Ansible"
 date = 2026-04-11T20:38:00+00:00
-draft = false
+draft = true
 description = "How several days of focused design made it possible to implement the local lifecycle of Vault on Hetzner in a few hours, add remote durability on S3, close the entire C2 test matrix, and leave VM, TazPod, and S3 in a coherent final state."
 tags = ["hetzner", "vault", "podman", "tailscale", "ansible", "s3", "backup", "disaster-recovery", "devops", "infrastructure", "crisp", "architecture"]
 categories = ["Infrastructure", "DevOps", "Architecture"]
