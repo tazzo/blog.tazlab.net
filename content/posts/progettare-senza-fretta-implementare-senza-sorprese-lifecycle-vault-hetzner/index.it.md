@@ -1,7 +1,7 @@
 +++
 title = "Progettare senza fretta, implementare senza sorprese: da lifecycle locale a backup remoto per Vault su Hetzner"
 date = 2026-04-11T20:38:00+00:00
-draft = false
+draft = true
 description = "Come diversi giorni di progettazione mirata hanno reso possibile implementare in poche ore il lifecycle locale di Vault su Hetzner, aggiungere la durabilità remota su S3, chiudere l'intera matrice di test C2 e lasciare VM, TazPod e S3 in uno stato finale coerente."
 tags = ["hetzner", "vault", "podman", "tailscale", "ansible", "s3", "backup", "disaster-recovery", "devops", "infrastructure", "crisp", "architecture"]
 categories = ["Infrastructure", "DevOps", "Architecture"]
