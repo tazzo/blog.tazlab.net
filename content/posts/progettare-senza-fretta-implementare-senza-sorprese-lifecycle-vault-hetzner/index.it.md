@@ -1,84 +1,225 @@
 +++
-title = "Progettare senza fretta, implementare senza sorprese: il lifecycle di Vault su Hetzner"
-date = 2026-04-11T14:00:00+00:00
-draft = true
-description = "L'evoluzione del metodo CRISP e la dimostrazione pratica del suo valore. Come tre giorni di design intensivo si sono tradotti in meno di due ore di implementazione perfetta del lifecycle di Vault su Hetzner."
-tags = ["hetzner", "vault", "podman", "tailscale", "ansible", "devops", "infrastructure", "crisp", "architecture"]
+title = "Progettare senza fretta, implementare senza sorprese: da lifecycle locale a backup remoto per Vault su Hetzner"
+date = 2026-04-11T20:38:00+00:00
+draft = false
+description = "Come diversi giorni di progettazione mirata hanno reso possibile implementare in poche ore il lifecycle locale di Vault su Hetzner, aggiungere la durabilità remota su S3, chiudere l'intera matrice di test C2 e lasciare VM, TazPod e S3 in uno stato finale coerente."
+tags = ["hetzner", "vault", "podman", "tailscale", "ansible", "s3", "backup", "disaster-recovery", "devops", "infrastructure", "crisp", "architecture"]
 categories = ["Infrastructure", "DevOps", "Architecture"]
 author = "Taz"
 +++
 
-# Progettare senza fretta, implementare senza sorprese: il lifecycle di Vault su Hetzner
+# Progettare senza fretta, implementare senza sorprese: da lifecycle locale a backup remoto per Vault su Hetzner
 
-Il completamento del passo *foundation* ci aveva lasciato con una certezza: separare le fasi di provisioning puro da quelle di configurazione applicativa semplifica enormemente la diagnosi dei problemi. Ma la vera prova del fuoco per la nuova metodologia operativa, battezzata internamente **CRISP** (Context, Research, Intent, Structure, Plan), doveva ancora arrivare.
+Ci sono sessioni infrastrutturali in cui il valore principale non è il numero di file modificati, ma la conferma che il metodo di lavoro sta funzionando davvero. Questa è una di quelle.
 
-Il target di questa sessione era uno dei componenti più critici dell'intera infrastruttura: l'implementazione del lifecycle locale di **HashiCorp Vault** sul nodo Hetzner, denominata `hetzner-vault-local-lifecycle` (fase C1). Parliamo di un nodo Vault che gira come container Podman, con storage Raft locale, crittografia TLS nativa, unseal automatizzato e un processo di bootstrap rigoroso.
+Negli ultimi giorni avevo separato in modo molto netto due fasi del runtime Vault su Hetzner. La prima, `hetzner-vault-local-lifecycle` (C1), aveva l'obiettivo di dimostrare che il nodo poteva esistere come entità locale coerente: TLS, storage Raft, bootstrap rigoroso, unseal automatico e contratti di identità chiari. La seconda, `hetzner-vault-s3-backup-recovery` (C2), doveva aggiungere durabilità remota e recovery: snapshot periodici, puntatori coerenti su S3, logica di confronto, riparazione della durabilità remota e, soprattutto, percorso di restore quando il nodo locale non esiste più ma la verità crittografica nel controller e i backup remoti sono ancora sani.
 
-Il contrasto tra il tempo speso a pensare e quello speso a eseguire è stato drastico: tre giorni interi dedicati esclusivamente alla progettazione, senza scrivere una singola riga di codice infrastrutturale. Una serie continua di review per limare e perfezionare ogni singolo dettaglio del piano. Il risultato? Un'implementazione completata a regola d'arte in meno di due ore. Una "passeggiata" tecnica, ma solo perché il percorso era stato tracciato con ossessiva precisione.
+A livello di cronologia, sembrano due lavori separati. A livello reale, però, sono stati un unico percorso. Per circa tre giorni ho lavorato quasi esclusivamente di progettazione: review, raffinamento, chiarimento di contratti, definizione di nomenclature, decision matrix, responsabilità fra Ansible e shell helper, comportamento in caso di stato ambiguo, flusso di bootstrap, ruolo di TazPod, struttura dei receipt, limiti del restore. Quando poi è arrivato il momento di implementare, il lavoro duro era già stato fatto. La parte di esecuzione si è compressa in poche ore e, soprattutto, si è svolta con una fluidità molto diversa da quella tipica dei lavori di questo tipo.
 
-## L'evoluzione del metodo CRISP: smussare i problemi prima del codice
+Questo non significa che non ci siano stati problemi. Ce ne sono stati, e alcuni anche istruttivi. Ma il tipo di problema è cambiato. Non mi sono trovato a rimettere in discussione l'architettura nel mezzo della sessione. Mi sono trovato invece davanti a problemi di integrazione, di dettagli operativi, di comportamento reale di tool come Podman, systemd, Tailscale e Vault. È una differenza enorme. Quando il design è solido, anche l'imprevisto smette di essere caos e diventa semplicemente un'anomalia da isolare e correggere.
 
-Il vero valore di un'architettura non si misura da quanto è complessa, ma da quanto è gestibile quando le cose vanno storte. Durante i tre giorni di design, ogni scelta è stata messa in discussione. Ho affrontato decisioni architetturali complesse che, se affrontate durante l'implementazione, avrebbero inevitabilmente generato caos.
+In questo articolo racconto l'intero passaggio: dal lifecycle locale fino al backup remoto su S3, con la verifica live della rotazione degli snapshot, la prova che lo stato remoto può essere inizializzato e riparato a partire dalla verità locale, il test reale del caso “unchanged snapshot”, i cicli distruttivi di restore e, soprattutto, la chiusura completa della matrice C2. Alla fine del lavoro non è rimasto un ramo “quasi pronto”: la VM è coerente, Vault è attivo, TazPod è coerente, S3 è coerente, il timer di backup è vivo e l'intero set di scenari progettati per C2 è stato eseguito e portato a verde.
 
-### La gestione dello State e del Lineage
+## Il punto di partenza: una C1 già credibile, non un prototipo fragile
 
-Una delle decisioni più complesse è stata la classificazione dello stato. Invece di affidarci a un semplice "se il file esiste, allora Vault è configurato", ho progettato un sistema di classificazione deterministico su tre domini indipendenti: lo stato di bootstrap sul controller (TazPod), lo stato di runtime locale su Vault e, in futuro, lo stato di recovery remoto su S3.
+Il primo elemento importante da capire è che C2 non è stata costruita sopra una base improvvisata. Il lavoro su C1 aveva già eliminato gran parte dell'entropia iniziale.
 
-Questo ha portato all'introduzione del concetto di **Vault Lineage ID**, un identificatore univoco generato durante il primo `vault operator init` e salvato in un file non segreto (`lifecycle-receipt.json`). Perché? Perché un riavvio di un container è radicalmente diverso dalla ricreazione di un'identità Vault. Senza un lineage chiaro, uno script di automazione rischia di sovrascrivere chiavi di unseal valide con una nuova inizializzazione accidentale, o di tentare un restore da un backup incompatibile.
+Il nodo Vault su Hetzner non era più un semplice container “che parte”. Era già un runtime con una propria identità ben definita. Il nodo host era `lushycorp-vm.ts.tazlab.net`, il servizio TLS di Vault era `lushycorp-api.ts.tazlab.net`, i path persistenti erano stabili, la configurazione TLS era chiara, il bootstrap produceva un `vault_lineage_id`, il receipt locale raccontava l'identità del cluster e il meccanismo di unseal automatico aveva già una forma precisa.
 
-### Il dilemma dell'Automated Unseal
+Questa distinzione è fondamentale anche da un punto di vista metodologico. Molti problemi di backup e restore nascono perché si tenta di progettare la recovery remota quando il sistema locale non è ancora definito rigorosamente. In quel caso, il layer remoto eredita ambiguità già presenti nel layer locale e le amplifica. Qui è successo l'opposto: il lavoro fatto su C1 ha ridotto i gradi di libertà. Quando ho iniziato C2, non dovevo più decidere “cosa sia” il nodo Vault. Dovevo solo decidere come estendere in modo rigoroso un'identità già definita.
 
-Un'altra scelta cruciale è stata l'approccio all'unseal. In un ambiente Enterprise cloud-native (come AWS), si userebbe un KMS (Key Management Service) per l'auto-unseal. In quello scenario, la macchina fa parte del perimetro di sicurezza del provider e gode di un'autenticazione forte implicita (es. IAM roles). Su un server Hetzner isolato, il discorso cambia: per usare un KMS esterno dovrei depositare sulla Virtual Machine un token o un certificato di autenticazione. Questo non aggiungerebbe un reale strato di sicurezza. Un eventuale attaccante che compromettesse la macchina, invece di trovarvi le chiavi di unseal, troverebbe semplicemente il certificato per andarsele a prendere dal KMS. Si sposterebbe solo il problema un passettino più in là. Poiché il confine di sicurezza in questo scenario è la Virtual Machine stessa (se un attaccante entra, ha già sfondato il muro), ho deciso di non introdurre questa complessità e di gestire l'unseal localmente.
+Per questo la divisione in fasi si è rivelata così utile. `foundation`, `local lifecycle`, `remote durability` non sono stati solo nomi di comodo. Sono stati veri confini diagnostici. Se qualcosa si rompeva nella durabilità remota, sapevo già che non stavo discutendo TLS, Tailscale di base, Podman runtime elementare o bootstrap locale. Questo riduce drasticamente il rumore quando si leggono i log e si devono prendere decisioni rapide.
 
-La soluzione adottata sfrutta lo standard Shamir Secret Sharing di Vault (impostato a 3 share totali con soglia a 2), conservando l'intero set di chiavi in modo sicuro nel vault crittografato del controller (TazPod). Sul nodo Hetzner, vengono depositate *esattamente* due chiavi (il minimo necessario per superare la soglia), lette da uno script locale (`vault-local-unseal.sh`) gestito da un'unità systemd (`vault-local-unseal.service`). In questo modo, se il nodo si riavvia, l'unità systemd esegue l'unseal in modo idempotente. Se il nodo viene compromesso o distrutto, l'operatore possiede ancora l'autorità crittografica per ricreare o revocare il cluster, poiché la terza chiave e il root token non risiedono mai sulla macchina esposta.
+## Il vero valore dei tre giorni di design
 
-## L'implementazione: i problemi "buoni" di un sistema deterministico
+La parte più interessante di questa sessione, almeno per me, non è stata tanto la scrittura del codice Ansible o dei helper script. È stato constatare in modo molto concreto che i tre giorni di design avevano davvero trasformato la sessione di implementazione.
 
-Arrivato il momento dell'esecuzione, il piano Ansible è stato tradotto in codice. Come previsto in ogni lavoro infrastrutturale a basso livello, ci sono stati degli ostacoli. Tuttavia, l'aspetto gratificante è che questi problemi sono emersi come *dettagli di integrazione*, non come difetti architetturali.
+Il punto non è semplicemente che “si è andati più veloci”. La velocità, in infrastruttura, da sola non dice molto. Si può andare veloci anche nella direzione sbagliata. Il punto è che la sessione si è svolta senza le tipiche rotture di continuità che capitano quando si programma l'architettura mentre si scrive il codice. Non ho dovuto fermarmi a metà per chiedermi se il bucket dovesse contenere l'ultimo snapshot globale o l'ultimo snapshot per lineage. Non ho dovuto ridefinire cosa fosse un restore “lecito”. Non ho dovuto decidere in corsa se l'admin token andasse ricreato sempre o solo in certi casi. Tutte queste scelte erano già state esplicitate.
 
-### Il nodo operatore Tailscale offline
+Questo ha avuto un effetto molto pratico: quando emergeva un problema, il problema era confinato. Se la service unit di backup non passava le variabili giuste, la correzione era locale. Se il path degli snapshot non era montato nel container, la correzione era locale. Se due snapshot logicamente identici avevano hash binari diversi, il problema non diventava improvvisamente una crisi della strategia di backup; diventava un affinamento del contratto di confronto. Questa differenza fra “problema confinato” e “problema sistemico” è il motivo per cui considero questa sessione un successo.
 
-Il primo ostacolo è stato una failed connection dell'operatore Ansible. L'inventory dinamico di Tailscale si aspettava che il demone `tailscaled` locale sull'operatore (TazPod) fosse in esecuzione e mappasse il tailnet. In questo ambiente isolato, il demone non era attivo.
+In termini più didattici: la progettazione preventiva non elimina i bug, ma trasforma il tipo di bug che incontri. Riduce il rischio di bug architetturali, cioè quelli che obbligano a cambiare modello mentale a metà lavoro. Quello che resta sono i bug di integrazione, di comportamento reale, di interfaccia fra componenti. Sono comunque fastidiosi, ma molto più trattabili.
 
-L'errore ha evidenziato un problema di identità: il nodo operatore locale era entrato nella rete come utente generico, ma le ACL (Access Control List) di Tailscale prevedevano che solo i nodi con il tag `tag:tazpod` potessero raggiungere la porta 22 del nodo `tag:tazlab-vault`. La soluzione è stata chirurgica e non ha richiesto alterazioni all'architettura: tramite le credenziali OAuth, ho chiamato le API di Tailscale (`POST /api/v2/tailnet/{tailnet}/keys`) per generare una nuova auth-key effimera con le capabilities esatte per applicare il `tag:tazpod`, avviando poi `tailscaled` in modalità userspace con un socket dedicato (`/tmp/tailscaled-operator.sock`). Questo ha ristabilito immediatamente il path `tailscale nc`, permettendo ad Ansible di fluire in sicurezza.
+## C2 in pratica: cosa doveva fare davvero
 
-### Podman 4.3.1 e l'inaffidabilità di Quadlet
+La seconda fase del progetto non doveva limitarsi a “salvare file su S3”. Una formulazione così semplice sarebbe stata pericolosamente incompleta. Il vero obiettivo era introdurre **durabilità remota coerente** senza confondere il concetto di backup con quello di identità.
 
-Il design prevedeva l'uso di **Quadlet**, un generatore systemd nativo per Podman che trasforma file dichiarativi `.container` in unità systemd. È uno standard eccellente per gestire i container come servizi nativi.
+Un Vault locale coerente produce una certa verità crittografica: chiavi di unseal, token amministrativi, lineage, stato Raft. Un backup remoto utile non è semplicemente un blob di dati; è un artefatto che deve poter essere riconnesso in modo affidabile a quella stessa identità. Da qui nasce il contratto dei pointer e del metadata. Non basta caricare uno snapshot. Bisogna sapere quale lineage rappresenta, quale slot è attivo, a quale hash corrisponde, e quale sia il candidato corretto da usare in fase di restore.
 
-Durante l'applicazione, però, l'unità `lushycorp-vault.service` generata da Quadlet semplicemente non veniva rilevata da systemd. La versione di Podman installata sulla Golden Image Debian (4.3.1) mostrava comportamenti imprevedibili con il generatore. In un contesto senza design, questo avrebbe scatenato il panico: "Cambiamo OS? Aggiorniamo Podman da repository non stabili?". 
+Per questo ho implementato tre livelli distinti nel bucket:
 
-Avendo i contratti ben definiti, la deviazione è stata pragmatica: ho sostituito il file `.container` con un'unità systemd esplicita di tipo `Type=simple` che esegue `podman run` in modo deterministico. Il contratto di servizio, i mount dei volumi e le variabili d'ambiente sono rimasti identici. L'interfaccia verso l'esterno non è cambiata, salvando l'implementazione senza corrompere l'intento architetturale.
+1. un **global pointer** (`vault/raft-snapshots/latest.json`) che indica il lineage attivo;
+2. un **lineage-local pointer** (`vault/raft-snapshots/<vault_lineage_id>/latest.json`) che indica il candidato attuale di restore per quella lineage;
+3. due slot remoti (`slot-a` e `slot-b`) che permettono una rotazione semplice e leggibile.
 
-### Capability e privilegi: il caso CAP_SETFCAP
+Questa struttura è stata una scelta importante anche per la leggibilità operativa. In fase di incident response, un sistema elegante ma opaco è spesso peggiore di un sistema leggermente più verboso ma trasparente. Qui volevo che un operatore, leggendo gli oggetti in S3 o i log locali, potesse capire quale fosse lo stato attivo senza dover “indovinare” a partire da convenzioni implicite.
 
-L'immagine ufficiale di HashiCorp Vault è progettata per gestire internamente il drop dei privilegi usando `libcap`. Quando ho provato a forzare l'esecuzione del container strettamente con `--user vault` (uid 100), il container andava in crash immediato con l'errore:
+## L'implementazione del runtime C2
 
-`unable to set CAP_SETFCAP effective capability: Operation not permitted`
+L'implementazione materiale si è distribuita su una superficie abbastanza ampia, ma molto ordinata. Ho aggiunto un playbook dedicato (`vault-s3-backup-recovery.yml`), nuovi file task nell'Ansible role condiviso, due helper shell dedicati per backup e restore, e nuove unità systemd per il timer orario e per il restore esplicito.
 
-L'analisi dei log ha rivelato che il wrapper di avvio dell'immagine tentava di impostare le file capabilities per permettere al binario `vault` di usare `mlock` (memory lock) pur non essendo root. Poiché il container era già avviato come utente non privilegiato, l'operazione falliva.
+Un aspetto importante del design era la divisione di responsabilità tra **Ansible** e **helper shell**. Gli helper non dovevano “decidere” il comportamento del sistema. Dovevano eseguire meccanicamente operazioni ristrette: salvare uno snapshot, calcolare hash, leggere o scrivere oggetti S3, eseguire il primitive di restore quando già autorizzato. La visibilità delle scelte — restore sì/no, failure sì/no, lineage selezionata, necessità di recreation dell'admin token — doveva rimanere nei task Ansible. Questo non è solo un vezzo stilistico. È una scelta che migliora auditabilità e debugging. Una macchina a stati che vive in task separati è molto più leggibile di una shell script che ingloba tutto e restituisce un generico codice di uscita.
 
-La soluzione ha richiesto un aggiustamento di precisione: ho rimosso il flag `--user vault` dal comando `podman run`, avviando il container come root, ma impostando esplicitamente `--entrypoint vault` per bypassare il wrapper problematico. Internamente, i processi sono comunque isolati, e a livello di host filesystem l'ownership rigorosa (`root:vault` per TLS, `vault:vault` per i dati Raft) ha garantito la sicurezza senza bloccare l'esecuzione.
+Sul nodo host sono comparsi anche nuovi punti fissi operativi:
 
-## Il "Fail-Fast" che ti salva la vita
+- `/etc/lushycorp-vault/s3.env` per le credenziali S3 root-only;
+- `/etc/lushycorp-vault/remote-restore.env` per il restore request contract;
+- `/etc/lushycorp-vault/snapshot-backup-token.txt` per il token limitato al backup;
+- `/var/log/lushycorp-vault/vault-snapshot-backup.log`;
+- `/var/log/lushycorp-vault/vault-remote-restore.log`.
 
-Il momento di massima soddisfazione tecnica è arrivato verso la fine dell'esecuzione. Avevo strutturato l'inizializzazione del nodo come un'operazione atomica in 3 fasi:
-1. **Phase A (Nodo Remoto):** Avvio Vault, init, unseal, mount del secret engine e generazione di token/policy in una directory di staging temporanea.
-2. **Phase B (Controller locale):** Download di questi artifact via Ansible e persistenza sicura all'interno del vault crittografato di TazPod.
-3. **Phase C (Nodo Remoto):** Se e solo se la Phase B ha successo, spostamento delle chiavi di unseal nella directory finale di bootstrap e scrittura del `lifecycle-receipt.json`.
+Questo dettaglio dei path è meno banale di quanto sembri. In sessioni lunghe o distribuite su più giorni, la differenza fra un sistema “osservabile” e uno che costringe a intuire lo stato dai sintomi secondari è enorme. Qui ogni fase importante ha un suo log noto prima dell'avvio. Quando qualcosa non andava, non ero costretto a ricostruire ex post dove potesse essere fallito. Potevo leggerlo direttamente.
 
-Al primo tentativo, un errore di sintassi nello script Ansible della Phase B ha impedito il salvataggio dei file sul controller. Il playbook è fallito.
+## I primi problemi: buoni problemi, non problemi architetturali
 
-Cosa è successo al successivo avvio? Il sistema ha ispezionato il nodo remoto. Ha visto che la directory dei dati Raft conteneva dei dati (Vault era stato inizializzato), ma mancava il `lifecycle-receipt.json` (la Phase C non era mai avvenuta). Il sistema ha classificato il nodo come **inconsistent** e si è fermato con un Hard Fail, rifiutandosi di proseguire.
+Il primo inciampo reale non ha riguardato Vault, ma il nodo operatore. La prima esecuzione C2 è fallita in fase di validazione Tailscale perché il sistema si aspettava il socket standard di `tailscaled`, mentre l'operatore locale stava usando una istanza userspace con socket dedicato in `/tmp/tailscaled-operator.sock`.
 
-Questo è il trionfo del design preventivo. In uno script di provisioning ingenuo, Ansible avrebbe tentato di reinizializzare Vault, distruggendo irreparabilmente il cluster, o peggio, avrebbe finto che tutto andasse bene lasciando l'operatore senza una copia sicura delle chiavi di unseal (memorizzate solo nella directory di staging effimera). Il guardrail ha funzionato esattamente come progettato: ha bloccato il disastro e mi ha obbligato a distruggere la VM per ricominciare l'intero processo da uno stato pulito.
+Il punto interessante non è tanto il fix — rilanciare `create.sh` con `TAILSCALE_SOCKET=/tmp/tailscaled-operator.sock` — quanto il fatto che il problema sia stato immediatamente leggibile e confinato. Il phase log dedicato alla validazione Tailscale mostrava chiaramente il fallimento del path locale. Non c'è stato nessun effetto domino ambiguo su Terraform, Ansible o Vault. Questo è esattamente il tipo di comportamento che ci si aspetta da un'orchestrazione ben separata in fasi.
 
-## Riflessioni post-lab
+Subito dopo sono emersi altri due problemi tipici da integrazione:
 
-Dopo aver risolto l'intoppo della Phase B, la successiva esecuzione ha completato tutte e tre le fasi senza sbavature. La VM era attiva, Vault era unsealed, le chiavi erano al sicuro nel controller, le chiamate TLS rispondevano correttamente e il cluster era pronto per il successivo step (l'integrazione del backup remoto S3, fase C2).
+- la service unit del backup non passava ancora tutte le variabili operative necessarie (`S3_BUCKET`, `S3_PREFIX`, ecc.);
+- il path degli snapshot esisteva sull'host ma non era montato nel container Vault.
 
-Cosa mi porto via da questa sessione? La conferma definitiva che l'approccio "Architettura prima del codice" riduce l'entropia ingegneristica. Quando i contratti sono definiti a priori — come i nomi esatti degli host (`lushycorp-vm.ts.tazlab.net`), i path dei volumi, i formati dei metadata — l'implementazione diventa una semplice operazione di traduzione.
+Entrambi sono stati risolti senza dover cambiare il modello. Ho corretto i template systemd per passare esplicitamente l'environment richiesto e ho aggiunto il mount della snapshot directory nella service unit del container. Questo è il tipo di lavoro che in una sessione poco preparata rischia di innescare dubbi più ampi (“forse il design del backup è sbagliato”). Qui invece era chiaro fin da subito che si trattava di un difetto locale di wiring.
 
-Il tempo "perso" in progettazione (quei 3 giorni di review asincrone e meticolose) non è stato perso affatto: è stato un investimento ad altissimo rendimento. Ci ha evitato giornate intere di frustrazione nel cercare di sbrogliare una matassa in cui permessi Podman, reti Tailscale e crittografia Vault si intrecciavano in modo incomprensibile. 
+## Il backup iniziale verso S3: prima prova reale della fase C2
 
-Progettare senza fretta ha permesso, ancora una volta, di implementare senza sorprese. E nel mondo dell'infrastruttura enterprise, "nessuna sorpresa" è il complimento migliore che un sistema possa ricevere.
+Una volta corretta la parte di wiring, il primo backup reale ha fatto quello che mi aspettavo da C2: ha trattato il layer remoto come autoritativamente ricostruibile a partire da una verità locale sana.
+
+Questo punto merita una spiegazione. Nel modello che avevo definito, un S3 “vuoto” o “incoerente” non deve bloccare un Vault locale già coerente. Se il nodo locale è sano e TazPod è sano, il layer remoto non è la sorgente primaria di verità: è la durabilità secondaria. Di conseguenza, il backup successivo deve poter inizializzare o riparare il contenuto remoto senza trasformare un problema di backup in un blocco totale del runtime.
+
+Ed è esattamente ciò che è successo. Il primo backup riuscito ha:
+
+- classificato il remote state;
+- scritto snapshot e metadata su S3;
+- creato il global pointer;
+- creato il lineage-local pointer;
+- impostato il primo slot attivo.
+
+Questa non è una vittoria puramente “meccanica”. È la prova che la distinzione fra verità locale e durabilità remota era stata modellata correttamente. Se il design fosse stato più confuso, il sistema avrebbe potuto tentare restore assurdi, bloccare il nodo per prudenza eccessiva, o scrivere oggetti remoti privi di contesto sufficiente per un futuro rebuild.
+
+## Generare uno stato distinguibile: il marker `marker-A`
+
+Per evitare test troppo astratti, ho voluto introdurre uno stato applicativo chiaramente riconoscibile dentro Vault. Ho quindi scritto un marker nel KV store, con identificatore `marker-A` e scenario `baseline-before-matrix`.
+
+Perché è importante? Perché i test di backup e restore non devono fermarsi al livello infrastrutturale. Sapere che Vault è “up” o “unsealed” non basta. In un sistema di segreti, la vera domanda è: *quali dati contiene esattamente questa istanza?* Se dopo un rebuild il sistema torna up ma ha perso o cambiato i dati, il test è fallito anche se systemd è felice.
+
+Questo marker ha avuto due usi molto concreti:
+
+1. ha reso visibile la differenza tra snapshot di stati diversi;
+2. ha fornito un riferimento da rileggere dopo i cicli distruttivi.
+
+È un piccolo dettaglio, ma rappresenta bene il tipo di approccio che preferisco nelle validazioni: evitare test puramente sintattici e introdurre almeno un segnale funzionale leggibile che permetta di dire “questo è davvero lo stesso Vault logico che mi aspettavo di recuperare”.
+
+## La scoperta più interessante: due snapshot uguali logicamente, ma diversi come file
+
+Il momento tecnicamente più istruttivo della sessione è arrivato quando ho verificato il comportamento del caso “unchanged snapshot”. Il contratto iniziale prevedeva una logica intuitiva: se l'hash del file snapshot corrente è uguale a quello dell'ultimo snapshot remoto, l'upload può essere saltato.
+
+Sulla carta è ragionevole. Nella pratica, si è rivelato falso.
+
+Ho eseguito un controllo di determinismo salvando due snapshot consecutivi senza modificare lo stato logico di Vault. Mi aspettavo file identici. Invece ho ottenuto:
+
+- **stesso contenuto logico** rilevato da `vault operator raft snapshot inspect`;
+- **stesso indice Raft**;
+- **hash file diversi**.
+
+Questa è una differenza importantissima. Significa che il file binario di snapshot incorpora abbastanza variabilità da non poter essere usato come criterio affidabile per dire “lo stato logico è rimasto uguale”. Se avessi lasciato il sistema così, ogni run avrebbe continuato a caricare snapshot nuovi anche in assenza di vere modifiche.
+
+La correzione che ho introdotto è stata semplice nel concetto ma molto importante nel risultato: ho separato **integrità del file** e **equivalenza logica**.
+
+- `snapshot_sha256` continua a descrivere il file preciso caricato su S3;
+- `snapshot_compare_fingerprint` viene calcolato a partire dall'output di `vault operator raft snapshot inspect` ed è usato per capire se lo stato logico è cambiato davvero.
+
+Dopo questo cambiamento, il test che prima avrebbe prodotto un falso positivo di “changed snapshot” ha finalmente restituito il comportamento corretto: `upload-skipped`. Per me questo è uno dei punti più riusciti dell'intera sessione, perché è un esempio perfetto di come un test reale possa migliorare il design senza distruggerlo. Il modello generale non era sbagliato. Aveva solo bisogno di un confronto più adatto alla semantica reale di Vault.
+
+## Il punto di svolta finale: chiudere davvero il restore `T1 + H0 + S1`
+
+Dopo aver validato il percorso di backup, sono passato alla parte più delicata: il caso `T1 + H0 + S1`, cioè TazPod coerente, host locale vuoto, S3 coerente. In termini pratici: il nodo viene distrutto, ma il controller possiede ancora il set canonico di bootstrap e S3 possiede un candidate di restore coerente. Questo è il cuore del disaster recovery per la fase C2.
+
+Quando ho scritto la prima versione di questo articolo, quel ramo non era ancora chiuso fino in fondo. I test distruttivi avevano già dimostrato che il restore veniva selezionato correttamente, che il lineage veniva risolto nel modo giusto e che il sistema arrivava molto avanti nella ricostruzione. Restavano però due difetti reali che impedivano di dichiarare la matrice verde.
+
+Il primo era un problema di **classificazione del remote state**. In alcune condizioni di oggetto mancante su S3, il codice non conservava correttamente la distinzione tra `empty` e `incoherent`. Il risultato era sottile ma importante: un lineage-local pointer assente poteva essere trattato nel ramo sbagliato. Il fix è stato piccolo come modifica di shell, ma grande come conseguenza operativa: ho corretto la cattura dell'exit code e reso affidabile la lettura dei `404` di S3 sia nel path di restore sia in quello di backup.
+
+Il secondo era il problema veramente decisivo: **dopo il restore il nodo non ricostruiva ancora in modo completamente autonomo il proprio local-unseal path host-side**. In pratica, Vault poteva essere riportato fino allo stato corretto, ma le due unseal share locali non venivano sempre reidratate e il servizio di unseal oneshot poteva concludersi troppo presto durante la finestra in cui il container non era ancora nel punto giusto del bootstrap post-restore.
+
+Qui il lavoro utile non è stato “aggiungere retry a caso”, ma rispettare il contratto C1/C2 già definito:
+
+- il restore C2 ora reidrata esplicitamente sul nodo host `unseal-share-1` e `unseal-share-2` a partire dal set canonico conservato in TazPod;
+- la logica di `vault-local-unseal.sh` ora distingue meglio il caso in cui Vault non è ancora inizializzato ma il materiale di unseal esiste già localmente, evitando di dichiarare successo troppo presto;
+- il playbook di convergenza non si limita più a confidare nel solo oneshot systemd: rilancia in modo esplicito l'helper di local unseal dopo il restore, così il check finale di stato avviene davvero dopo la ricostruzione del path di unseal.
+
+Dopo questi fix, il ramo `T1 + H0 + S1` è passato fino in fondo. Il nodo viene distrutto, ricreato, Vault viene ripristinato dal candidate corretto su S3, il receipt locale viene aggiornato, le unseal share host-side tornano presenti, il local-unseal riprende correttamente e il Vault finale torna `initialized=true` e `sealed=false` senza riconciliazione manuale.
+
+Il segnale più importante, comunque, è rimasto lo stesso: dopo la parte distruttiva e il restore completo, il contenuto logico atteso era ancora lì. Non stavo ottenendo un Vault “vivo ma nuovo”; stavo davvero recuperando l'istanza logica che volevo riportare in linea.
+
+## Dalla mezza vittoria alla matrice completa verde
+
+La differenza tra una sessione promettente e una sessione chiusa sta tutta qui: a un certo punto smetti di dire “il modello sembra giusto” e inizi a poter dire “la matrice progettata è passata davvero”. È esattamente quello che è successo nel passaggio finale di C2.
+
+Dopo il primo blocco di implementazione e i primi test live, avevo già prove forti su backup, pointer, repair e confronto semantico degli snapshot. Il lavoro finale ha trasformato quelle prove parziali in un set completo di scenari eseguiti uno per uno.
+
+In pratica sono stati chiusi tutti i casi progettati per T7:
+
+- `T0 + H0 + S0` -> fresh init consentito;
+- `T0 + H0 + S1` -> hard fail perché manca l'anchor canonico in TazPod;
+- `T1 + H0 + S1` -> restore riuscito durante `create.sh`;
+- `T1 + H0 + S0` -> hard fail, nessun fake restore;
+- `T1 + H0 + S2` -> hard fail;
+- `T1 + H1 + S0` -> il backup inizializza correttamente il layer remoto;
+- `T1 + H1 + S2` -> il backup ripara correttamente il layer remoto da verità locale coerente;
+- unchanged run -> `upload-skipped` reale;
+- first valid backup into remote-empty lineage -> scrittura su `slot-a` + lineage-local pointer;
+- changed run on coherent lineage -> switch sullo slot inattivo;
+- pointer mancante con slot ancora presenti -> restore hard-fail e repair successivo tramite backup;
+- metadata mismatch -> hard fail esplicito;
+- TazPod incoerente -> hard fail;
+- host locale incoerente -> hard fail.
+
+Questo passaggio è importante anche concettualmente. Finché una matrice resta parzialmente aperta, il sistema è ancora “promettente”. Quando invece hai coperto anche i casi brutti — pointer assente, metadata corrotti, lineage mismatch, stato locale incoerente — il sistema smette di essere solo convincente in demo e inizia a diventare credibile in esercizio.
+
+## Il risultato più bello: gli imprevisti finali hanno confermato il design, non l'hanno demolito
+
+Paradossalmente, i problemi emersi nell'ultima parte sono la prova migliore che i giorni di design sono serviti davvero.
+
+Se il modello fosse stato fragile, questi ultimi test avrebbero costretto a rimettere mano alla strategia generale: magari cambiare la struttura dei pointer, cambiare il rapporto fra TazPod e S3, o riscrivere la semantica dei casi `empty/incoherent`. Invece non è successo. I problemi si sono rivelati esattamente del tipo che speravo di incontrare in una sessione ben preparata: problemi locali, leggibili, confinati.
+
+- un bug nel capture dell'exit code di shell;
+- un problema preciso nella ricostruzione del materiale host-side dopo restore;
+- un timing troppo ottimistico nel local-unseal post-restore.
+
+Sono problemi veri, ma non sono problemi architetturali. E questa, per me, è la differenza tra una sessione caotica e una sessione ingegnerizzabile.
+
+## Lo stato finale lasciato volutamente sano e coerente
+
+Alla fine del lavoro non ho lasciato dietro di me una macchina “abbastanza buona per smettere di testare”. Ho riconciliato esplicitamente l'ambiente fino a uno stato finale pulito, coerente e riusabile.
+
+Lo stato conclusivo è questo:
+
+- VM Hetzner attiva e raggiungibile;
+- `lushycorp-vault.service` attivo;
+- `vault-local-unseal.service` attivo;
+- Vault inizializzato e unsealed;
+- TazPod coerente con il set canonico di artifact;
+- S3 coerente con global pointer e lineage-local pointer validi;
+- timer di backup attivo;
+- log principali presenti e consultabili;
+- lineage canonica finale riallineata su `d91c4d14-30a6-4518-b162-d1c1a1b9c069`.
+
+C'è un dettaglio che considero importante raccontare apertamente: durante i test di fresh init è stata generata anche una nuova lineage temporanea. Sarebbe stato facile considerarla “rumore di laboratorio” e ignorarla. Invece il lavoro serio è proprio quello di non lasciare rumore in giro. Alla fine della sessione quella lineage temporanea non è stata lasciata come stato operativo: il runtime finale è stato riportato in coerenza con la lineage canonica originale, sia su host che in TazPod e S3.
+
+Questa scelta è intenzionale. In un contesto che vuole comportarsi in modo sempre più enterprise, anche la fine della sessione è parte del lavoro. Non basta dimostrare che il test passa. Bisogna lasciare il sistema in una condizione comprensibile e operabile dalla sessione successiva.
+
+## Riflessioni post-lab, adesso che C2 è davvero chiusa
+
+Se dovessi riassumere questa tappa in una sola frase, oggi la formulerei così: **la progettazione ha spostato la difficoltà da “capire cosa costruire” a “chiudere con precisione gli ultimi dettagli reali fino a far passare tutta la matrice”**.
+
+È esattamente il tipo di risultato che volevo ottenere con CRISP. Non perché il coding debba diventare banale, ma perché il coding dovrebbe essere l'ultima fase di una catena di decisioni già mature. In questa sessione il risultato si è visto in modo molto concreto: pochi problemi veramente imprevisti, tutti leggibili dai log, quasi tutti confinati, nessun crollo dell'impianto architetturale e nessuna sorpresa davvero distruttiva emersa dal nulla.
+
+La differenza rispetto alla prima bozza di questo articolo è che ora non devo più fermarmi a dire “la recovery non è ancora completamente chiusa”. Posso dire qualcosa di più forte e più utile: il backup remoto è reale, il confronto degli snapshot è stato corretto sulla base del comportamento effettivo di Vault, il restore distruttivo è stato chiuso, i casi di hard-fail sono stati verificati, il runtime resta coerente fra TazPod, host e S3 e la fase C2 può essere considerata conclusa.
+
+Questo, per una piattaforma di segreti su un singolo nodo Hetzner costruita con Podman, systemd, Tailscale, Ansible e S3, è un risultato molto significativo. Non perché sia “perfetto” in senso assoluto, ma perché ha raggiunto quel punto raro in cui design, implementazione, test distruttivi e stato finale operativo raccontano finalmente la stessa storia.
+
+Progettare senza fretta non ha eliminato il lavoro. Lo ha reso proporzionato. E, soprattutto, ha reso l'implementazione abbastanza lineare da far sembrare naturale qualcosa che, senza quei giorni di design, sarebbe probabilmente degenerato in molte più ore di debugging caotico.
+
+Per questa fase, è un ottimo posto dove fermarsi: con un Vault vivo, una durabilità remota credibile, una recovery davvero chiusa, una matrice completa portata a verde e la conferma che il tempo speso a pensare prima del codice continua a essere l'investimento più redditizio dell'intero laboratorio.
