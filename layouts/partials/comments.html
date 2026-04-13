@@ -1,0 +1,86 @@
+{{ if .Site.Params.cusdis.enabled }}
+<div class="mt-16 pt-8 border-t border-neutral-200 dark:border-neutral-700 w-full">
+  <h2 class="text-2xl font-bold mb-6 text-neutral-800 dark:text-neutral-200">{{ i18n "comments.title" | default "Comments" }}</h2>
+  
+  <div id="cusdis_thread"
+    data-host="{{ .Site.Params.cusdis.host }}"
+    data-app-id="{{ .Site.Params.cusdis.appId }}"
+    data-page-id="{{ .File.UniqueID }}"
+    data-page-url="{{ .Permalink }}"
+    data-page-title="{{ .Title }}"
+    data-theme="auto"
+    class="w-full">
+  </div>
+  
+  <script>
+    // 1. Sincronizzazione Tema
+    function getBlowfishTheme() {
+      return document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+    }
+    const thread = document.getElementById('cusdis_thread');
+    thread.setAttribute('data-theme', getBlowfishTheme());
+
+    const themeObserver = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'class' && window.CUSDIS) {
+          window.CUSDIS.setTheme(getBlowfishTheme());
+        }
+      });
+    });
+    themeObserver.observe(document.documentElement, { attributes: true });
+
+    // 2. Risoluzione definitiva altezza iframe (Accesso diretto al srcdoc)
+    const cusdisObserver = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.addedNodes.length === 0) return;
+        const iframe = Array.from(mutation.addedNodes).find(node => node.tagName === 'IFRAME');
+        if (!iframe) return;
+
+        // Disabilitiamo nativamente la scrollbar
+        iframe.setAttribute('scrolling', 'no');
+        iframe.style.setProperty('overflow-y', 'hidden', 'important');
+
+        // Calcolo altezza esatta dall'interno
+        iframe.onload = () => {
+          const updateHeight = () => {
+            try {
+              const body = iframe.contentWindow.document.body;
+              const html = iframe.contentWindow.document.documentElement;
+              const height = Math.max(
+                body.scrollHeight, body.offsetHeight,
+                html.clientHeight, html.scrollHeight, html.offsetHeight
+              );
+              // Aggiungiamo 20px di margine di sicurezza per le ombre dei pulsanti
+              iframe.style.setProperty('height', (height + 20) + 'px', 'important');
+            } catch (e) {}
+          };
+
+          // Eseguiamo subito
+          updateHeight();
+
+          // Ascoltiamo qualsiasi modifica interna (es. l'utente che digita nel campo Reply)
+          try {
+            const internalObserver = new MutationObserver(updateHeight);
+            internalObserver.observe(iframe.contentWindow.document.body, { 
+              childList: true, 
+              subtree: true, 
+              characterData: true,
+              attributes: true 
+            });
+          } catch(e) {}
+        };
+      });
+    });
+    cusdisObserver.observe(thread, { childList: true });
+
+  </script>
+  
+  <script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
+</div>
+{{ end }}
+
+
+
+
+
+
