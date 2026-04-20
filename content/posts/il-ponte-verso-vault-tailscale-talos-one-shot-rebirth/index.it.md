@@ -102,21 +102,21 @@ Un'analisi con `kubectl describe pod` ha rivelato l'intoppo: `failed to setup ne
 
 Cosa stava succedendo? Terraform aveva completato la sua fase. I nodi Kubernetes venivano riportati come `Ready`. Lo script procedeva a innescare Flux. Flux chiedeva all'API server di programmare i pod. L'API server ordinava a `kubelet` di avviarli. Ma il CNI (Container Network Interface), nel mio caso **Flannel**, non aveva ancora finito di distribuire i pod sui nodi, di allocare le subnet e di configurare le regole `iptables`. I container nascevano in un vuoto pneumatico senza connettività di rete.
 
-La soluzione non consisteva nel modificare GitOps, ma nell'insegnare la pazienza allo script di bootstrap. Ho dovuto inserire dei "cancelli" temporali espliciti nel `create.sh`. Prima di passare il testimone a Flux e al layer infrastrutturale, lo script ora interroga in modo attivo lo stato del cluster, rifiutandosi di procedere finché i componenti core non dimostrano di essere operativi.
+La soluzione non consisteva nel bloccare brutalmente lo script di bootstrap con cicli di attesa (un approccio "imperativo" e fragile), ma nell'insegnare la pazienza direttamente a Flux, adottando una strategia più "Enterprise". Ho modificato la `Kustomization` di base (quella che definisce i layer fondamentali) aggiungendo degli `healthChecks` nativi.
 
-```bash
-# Ensure Flannel and CoreDNS are ready before proceeding to engine
-until kubectl wait --for=condition=Ready pod -l k8s-app=flannel -n kube-system --timeout=10s 2>/dev/null; do
-  echo "⏳ Waiting for Flannel to be Ready..."
-  sleep 5
-done
-until kubectl wait --for=condition=Ready pod -l k8s-app=kube-dns -n kube-system --timeout=10s 2>/dev/null; do
-  echo "⏳ Waiting for CoreDNS to be Ready..."
-  sleep 5
-done
+```yaml
+  healthChecks:
+    - apiVersion: apps/v1
+      kind: DaemonSet
+      name: kube-flannel
+      namespace: kube-system
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: coredns
+      namespace: kube-system
 ```
 
-Questo approccio garantisce che quando l'orchestratore di alto livello (Flux) inizia a chiedere risorse di rete, il layer fisico e logico di basso livello sia pronto a rispondergli.
+Questo approccio garantisce che quando l'orchestratore di alto livello (Flux) inizia a chiedere risorse per le Kustomization successive (come Traefik o External-Secrets), il layer fisico e logico di basso livello sia pronto a rispondergli, congelando a cascata l'intero albero delle dipendenze GitOps finché la rete non è effettivamente solida.
 
 ## Il Paradosso del Secret di Grafana nel Disaster Recovery
 

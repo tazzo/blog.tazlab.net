@@ -102,21 +102,21 @@ An analysis with `kubectl describe pod` revealed the snag: `failed to setup netw
 
 What was going on? Terraform had completed its phase. Kubernetes nodes were reported as `Ready`. The script proceeded to trigger Flux. Flux asked the API server to schedule the pods. The API server ordered `kubelet` to start them. But the CNI (Container Network Interface), in my case **Flannel**, had not yet finished distributing the pods onto the nodes, allocating subnets, and configuring `iptables` rules. The containers were being born in a pneumatic vacuum without network connectivity.
 
-The solution was not to modify GitOps, but to teach patience to the bootstrap script. I had to insert explicit time "gates" into `create.sh`. Before passing the baton to Flux and the infrastructure layer, the script now actively polls the cluster state, refusing to proceed until the core components prove to be operational.
+The solution was not to brutally block the bootstrap script with wait loops (an "imperative" and fragile approach), but to teach patience directly to Flux, adopting a more "Enterprise" strategy. I modified the base `Kustomization` (the one defining the fundamental layers) by adding native `healthChecks`.
 
-```bash
-# Ensure Flannel and CoreDNS are ready before proceeding to engine
-until kubectl wait --for=condition=Ready pod -l k8s-app=flannel -n kube-system --timeout=10s 2>/dev/null; do
-  echo "⏳ Waiting for Flannel to be Ready..."
-  sleep 5
-done
-until kubectl wait --for=condition=Ready pod -l k8s-app=kube-dns -n kube-system --timeout=10s 2>/dev/null; do
-  echo "⏳ Waiting for CoreDNS to be Ready..."
-  sleep 5
-done
+```yaml
+  healthChecks:
+    - apiVersion: apps/v1
+      kind: DaemonSet
+      name: kube-flannel
+      namespace: kube-system
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: coredns
+      namespace: kube-system
 ```
 
-This approach guarantees that when the high-level orchestrator (Flux) starts requesting network resources, the low-level physical and logical layer is ready to answer.
+This approach guarantees that when the high-level orchestrator (Flux) starts requesting resources for subsequent Kustomizations (like Traefik or External-Secrets), the low-level physical and logical layer is ready to answer, cascadingly freezing the entire GitOps dependency tree until the network is genuinely solid.
 
 ## The Paradox of the Grafana Secret in Disaster Recovery
 
