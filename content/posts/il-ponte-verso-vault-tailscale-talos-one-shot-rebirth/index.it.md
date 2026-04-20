@@ -2,7 +2,7 @@
 title = "Il ponte verso Vault: Tailscale, Talos e l'arte del One-Shot Rebirth in Kubernetes"
 date = 2026-04-19T05:30:00+00:00
 draft = false
-description = "Come ho connesso un cluster Talos alla Tailnet per comunicare con Vault, preservando la filosofia del Castello Effimero e risolvendo le complesse race condition tra GitOps, Longhorn e il restore di PostgreSQL."
+description = "Come ho connesso un cluster Talos alla Tailnet per comunicare con Vault, preservando la filosofia del Castello Effimero e risolvendo le complesse race condition tra GitOps e il restore di PostgreSQL."
 tags = ["kubernetes", "talos", "tailscale", "vault", "gitops", "flux", "postgres", "longhorn", "disaster-recovery", "devops"]
 categories = ["Infrastructure", "DevOps", "Architecture"]
 author = "Taz"
@@ -118,41 +118,6 @@ done
 
 Questo approccio garantisce che quando l'orchestratore di alto livello (Flux) inizia a chiedere risorse di rete, il layer fisico e logico di basso livello sia pronto a rispondergli.
 
-### Il PersistentVolumeClaim Binding e l'attesa dello Storage
-
-Risolto il problema di rete, si è presentata la seconda race condition, ben più subdola, che riguardava il layer di storage.
-
-Il TazLab utilizza **Longhorn** come sistema di storage distribuito. Longhorn aggrega lo spazio disco dei vari nodi worker e lo espone a Kubernetes tramite il protocollo CSI (Container Storage Interface). Nel flusso di rinascita, l'obiettivo più critico è il ripristino del database PostgreSQL tramite l'operatore PGO (Postgres Operator di CrunchyData). 
-
-Il flusso atteso era:
-1. Flux installa Longhorn.
-2. Flux installa PGO.
-3. PGO richiede la creazione di un cluster Postgres.
-4. Kubernetes chiede a Longhorn un Persistent Volume (PV).
-5. PGO avvia il Job di `pgbackrest` per fare il restore dei dati dal bucket S3 dentro quel volume.
-
-Durante le esecuzioni di test, osservavo i log e vedevo che i pod del database (sia il primary che il job di restore) rimanevano inchiodati in stato `Pending`. L'evento associato era chiaro: `0/2 nodes are available: pod has unbound immediate PersistentVolumeClaims`.
-
-Da un punto di vista strettamente kubernernates-nativo, questo comportamento è *corretto*. Il pod aspetta che il PersistentVolumeClaim (PVC) venga legato (Bound) a un volume reale. Il vero problema era che il mio script di `create.sh` considerava la sua missione compiuta non appena Flux terminava di applicare le manifestazioni base, uscendo con un codice di successo. 
-
-Longhorn è un sistema complesso (è formato da manager, engine image, csi-attacher, csi-provisioner) e richiede svariati secondi (o minuti, su hardware modesto) per dichiararsi pronto a servire volumi. Nel tempo intercorso tra l'applicazione delle risorse e la reale operatività del CSI, lo script terminava, lasciandomi nell'incertezza: il database si ripristinerà o Longhorn è fallito in silenzio?
-
-Ancora una volta, la soluzione è stata l'aggiunta di barriere di osservazione nel ciclo di orchestrazione. Lo script imperativo deve aspettare l'assestamento dello stato dichiarativo.
-
-```bash
-echo "⏳ Waiting for Longhorn volumes to bind..."
-until kubectl get pvc -A --no-headers 2>/dev/null | grep -qE 'Bound'; do
-  sleep 5
-done
-
-echo "⏳ Waiting for database restore to actually start..."
-until kubectl get job -n tazlab-db tazlab-db-pgbackrest-restore >/dev/null 2>&1; do
-  sleep 5
-done
-```
-
-Questo snippet non interferisce con la logica del cluster. Si limita a sospendere la dichiarazione di successo fino a quando Kubernetes non certifica che almeno un volume è stato materialmente erogato da Longhorn, e che il cruciale Job di restore ha fisicamente iniziato il suo lavoro.
-
 ## Il Paradosso del Secret di Grafana nel Disaster Recovery
 
 L'ultimo capitolo di questa indagine infrastrutturale ha riguardato un disallineamento puramente applicativo che emerge solo durante un disastro (reale o simulato).
@@ -232,6 +197,6 @@ Quattordici minuti dopo, lo script ha terminato l'esecuzione riportando il corre
 
 Questo risultato dimostra per l'ennesima volta la validità del framework di lavoro che sto adottando. Il tempo investito nella progettazione teorica (la fase di Design) ha fatto in modo che, durante l'implementazione pratica, non si siano mai presentati problemi di tipo architetturale. Nessuno dei paradigmi (Tailscale su Talos, GitOps, backup remoto via S3) è stato messo in discussione. 
 
-I problemi affrontati — l'autenticazione monouso, i timeout di rete, il ritardo di erogazione dello storage, il disallineamento dei segreti di monitoring post-restore — sono stati esclusivamente di natura cronologica e integrativa. Bug operativi che, in un'architettura solida, si affrontano e si sconfiggono isolandoli metodicamente, trasformando un caotico fallimento a cascata in una prevedibile e ordinata rinascita. 
+I problemi affrontati — l'autenticazione monouso, i timeout di rete, il disallineamento dei segreti di monitoring post-restore — sono stati esclusivamente di natura cronologica e integrativa. Bug operativi che, in un'architettura solida, si affrontano e si sconfiggono isolandoli metodicamente, trasformando un caotico fallimento a cascata in una prevedibile e ordinata rinascita. 
 
 Il ponte è costruito. Il Castello Effimero è di nuovo in piedi e, grazie alla VPN mesh, è finalmente pronto a parlare, nel prossimo passo, con l'istanza isolata di HashiCorp Vault.

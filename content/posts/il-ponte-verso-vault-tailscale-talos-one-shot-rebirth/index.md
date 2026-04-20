@@ -2,7 +2,7 @@
 title = "The Bridge to Vault: Tailscale, Talos, and the Art of One-Shot Rebirth in Kubernetes"
 date = 2026-04-19T05:30:00+00:00
 draft = false
-description = "How I connected a Talos cluster to the Tailnet to communicate with Vault, preserving the Ephemeral Castle philosophy and resolving complex race conditions between GitOps, Longhorn, and PostgreSQL restore."
+description = "How I connected a Talos cluster to the Tailnet to communicate with Vault, preserving the Ephemeral Castle philosophy and resolving complex race conditions between GitOps and PostgreSQL restore."
 tags = ["kubernetes", "talos", "tailscale", "vault", "gitops", "flux", "postgres", "longhorn", "disaster-recovery", "devops"]
 categories = ["Infrastructure", "DevOps", "Architecture"]
 author = "Taz"
@@ -47,7 +47,7 @@ patch_talos_tailscale_extension() {
 # [...] Node inventory parsing logic
 for ordinal, node_ip in entries:
     hostname = f"{cluster_name}-{role}-{ordinal}"
-    
+
     extension_doc = {
         "apiVersion": "v1alpha1",
         "kind": "ExtensionServiceConfig",
@@ -59,7 +59,7 @@ for ordinal, node_ip in entries:
             "TS_STATE_DIR=/var/lib/tailscale",
         ],
     }
-    
+
     # [...] Temporary yaml generation on /dev/shm and application via talosctl
 EOF
     echo "✅ Tailscale ExtensionServiceConfig patches applied without persisting TS_AUTHKEY."
@@ -117,41 +117,6 @@ done
 ```
 
 This approach guarantees that when the high-level orchestrator (Flux) starts requesting network resources, the low-level physical and logical layer is ready to answer.
-
-### PersistentVolumeClaim Binding and Waiting for Storage
-
-Once the network problem was resolved, the second, much more subtle race condition presented itself, concerning the storage layer.
-
-The TazLab uses **Longhorn** as a distributed storage system. Longhorn aggregates the disk space of the various worker nodes and exposes it to Kubernetes via the CSI (Container Storage Interface) protocol. In the rebirth flow, the most critical goal is the restoration of the PostgreSQL database via the PGO operator (Postgres Operator by CrunchyData).
-
-The expected flow was:
-1. Flux installs Longhorn.
-2. Flux installs PGO.
-3. PGO requests the creation of a Postgres cluster.
-4. Kubernetes asks Longhorn for a Persistent Volume (PV).
-5. PGO starts the `pgbackrest` Job to restore data from the S3 bucket into that volume.
-
-During test executions, I observed the logs and saw that the database pods (both the primary and the restore job) remained nailed in the `Pending` state. The associated event was clear: `0/2 nodes are available: pod has unbound immediate PersistentVolumeClaims`.
-
-From a strictly Kubernetes-native point of view, this behavior is *correct*. The pod waits for the PersistentVolumeClaim (PVC) to be Bound to a real volume. The real problem was that my `create.sh` script considered its mission accomplished as soon as Flux finished applying the base manifests, exiting with a success code.
-
-Longhorn is a complex system (consisting of manager, engine image, csi-attacher, csi-provisioner) and requires several seconds (or minutes, on modest hardware) to declare itself ready to serve volumes. In the time elapsed between the application of the resources and the actual operability of the CSI, the script terminated, leaving me in uncertainty: will the database be restored or has Longhorn failed silently?
-
-Once again, the solution was the addition of observation barriers in the orchestration loop. The imperative script must wait for the declarative state to settle.
-
-```bash
-echo "⏳ Waiting for Longhorn volumes to bind..."
-until kubectl get pvc -A --no-headers 2>/dev/null | grep -qE 'Bound'; do
-  sleep 5
-done
-
-echo "⏳ Waiting for database restore to actually start..."
-until kubectl get job -n tazlab-db tazlab-db-pgbackrest-restore >/dev/null 2>&1; do
-  sleep 5
-done
-```
-
-This snippet does not interfere with cluster logic. It merely suspends the declaration of success until Kubernetes certifies that at least one volume has been materially provisioned by Longhorn, and that the crucial restore Job has physically begun its work.
 
 ## The Paradox of the Grafana Secret in Disaster Recovery
 
@@ -232,6 +197,6 @@ Fourteen minutes later, the script finished execution, reporting the successful 
 
 This result demonstrates once again the validity of the working framework I am adopting. The time invested in theoretical design (the Design phase) ensured that, during practical implementation, architectural problems never arose. None of the paradigms (Tailscale on Talos, GitOps, remote backup via S3) was questioned.
 
-The problems faced—single-use authentication, network timeouts, storage provisioning delays, misalignment of monitoring secrets post-restore—were exclusively of a chronological and integrative nature. Operational bugs that, in a solid architecture, are faced and defeated by isolating them methodically, transforming a chaotic cascading failure into a predictable and orderly rebirth.
+The problems faced—single-use authentication, network timeouts, misalignment of monitoring secrets post-restore—were exclusively of a chronological and integrative nature. Operational bugs that, in a solid architecture, are faced and defeated by isolating them methodically, transforming a chaotic cascading failure into a predictable and orderly rebirth. 
 
 The bridge is built. The Ephemeral Castle is standing once again and, thanks to the mesh VPN, it is finally ready to speak, in the next step, with the isolated instance of HashiCorp Vault.
