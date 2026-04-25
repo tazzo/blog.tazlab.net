@@ -20,7 +20,7 @@ Il problema concreto era questo: ogni volta che volevo far lavorare un agente su
 
 Per questo ho deciso di fare un passo ulteriore: costruire un vero wiki di progetto, pubblicato come servizio del cluster, organizzato in pagine atomiche, linkate tra loro, e pensato esplicitamente per essere sezionato in micro-contesti utili a futuri agenti. Il risultato è ora visibile qui:
 
-**`https://wiki.tazlab.net`**
+**[wiki.tazlab.net](https://wiki.tazlab.net)**
 
 Questa non è solo la cronaca di un nuovo servizio statico deployato sul cluster. È la cronaca di un cambio di livello: trattare la documentazione non come una conseguenza del progetto, ma come una sua parte operativa. E, nel mio caso, trattarla con la stessa serietà con cui tratto il GitOps, l'infrastruttura o la gestione dei segreti.
 
@@ -30,8 +30,8 @@ L'ispirazione di fondo viene da un'idea che negli ultimi mesi ha iniziato a circ
 
 Il riferimento esplicito è il lavoro di Andrej Karpathy, in particolare:
 
-- il gist: `https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f`
-- il tweet: `https://x.com/karpathy/status/2039805659525644595`
+- il gist: [https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f)
+- il tweet: [https://x.com/karpathy/status/2039805659525644595](https://x.com/karpathy/status/2039805659525644595)
 
 L'idea è semplice solo in apparenza. Se un progetto cresce, il codice da solo non è più un'interfaccia sufficiente per ricostruire il contesto. Il codice è la verità dell'implementazione. Ma non è sempre la verità della navigazione mentale. Non ti dice facilmente perché una cosa è stata fatta in un certo modo, in quale cartella cercare una certa responsabilità, quali concetti appartengono a un certo sottosistema, quali pagine leggere prima di mettere mano a una pipeline o a un runtime.
 

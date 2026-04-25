@@ -20,7 +20,7 @@ The concrete problem was this: every time I wanted to make an agent work on a sp
 
 Because of that, I decided to take one more step: build a real project wiki, publish it as a service inside the cluster, organize it into atomic pages, link those pages together, and explicitly design it so it could be sliced into micro-contexts useful for future agents. The result is now visible here:
 
-**`https://wiki.tazlab.net`**
+**[wiki.tazlab.net](https://wiki.tazlab.net)**
 
 This is not just the chronicle of a new static service deployed into the cluster. It is the chronicle of a change in level: treating documentation not as a consequence of the project, but as one of its operational parts. And, in my case, treating it with the same seriousness I apply to GitOps, infrastructure, and secrets management.
 
@@ -30,8 +30,8 @@ The underlying inspiration comes from an idea that has been circulating a lot re
 
 The explicit reference is Andrej Karpathy's work, in particular:
 
-- the gist: `https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f`
-- the tweet: `https://x.com/karpathy/status/2039805659525644595`
+- the gist: [https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f)
+- the tweet: [https://x.com/karpathy/status/2039805659525644595](https://x.com/karpathy/status/2039805659525644595)
 
 The idea looks simple only at first glance. Once a project grows, code alone is no longer a sufficient interface to reconstruct context. Code is the truth of implementation. But it is not always the truth of mental navigation. It does not easily tell you why something was done a certain way, which directory holds a specific responsibility, which concepts belong to which subsystem, or which pages you should read before touching a pipeline or a runtime.
 
