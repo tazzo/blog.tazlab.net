@@ -26,8 +26,8 @@
   weight = 5
 
 [[main]]
-  name = "Guide"
-  pageRef = "guides"
+  name = "Tazlab-Wiki"
+  url = "https://wiki.tazlab.net"
   weight = 20
 
 [[main]]
