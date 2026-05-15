@@ -1,9 +1,9 @@
 +++
-title = "Pet vs Cattle su Proxmox LXC: Come Ottenere Persistenza PVC-like con Solo API Token"
+title = "Hermes Agent su Proxmox LXC: Pet vs Cattle per la Persistenza PVC-like"
 date = 2026-05-15T14:00:00+02:00
 draft = false
 tags = ["Proxmox", "LXC", "Terraform", "Ansible", "Hermes", "LVM-thin", "Storage", "Persistenza"]
-description = "Deploy di Hermes Agent su Proxmox LXC. Dalla scelta bare-metal contro Docker, al 403 dei bind-mount, fino alla soluzione Pet vs Cattle per la persistenza dei dati su LVM-thin."
+description = "Deploy di Hermes Agent su Proxmox LXC. Dalla scelta bare-metal contro Docker, al 403 dei bind-mount, fino al pattern Pet vs Cattle per la persistenza PVC-like su LVM-thin con solo token API."
 author = "Tazzo"
 +++
 
