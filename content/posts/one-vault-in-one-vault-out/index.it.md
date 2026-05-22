@@ -2,7 +2,7 @@
 title = "One Vault In, One Vault Out: Migrare Segreti Senza Fermare il Cluster"
 date = 2026-05-22T22:45:00+00:00
 draft = false
-description = "Come la progettazione a slice (CRISP) e un ciclo di hardening hanno permesso di migrare 20 segreti da Infisical a Vault e validare il tutto con un destroy/create da zero."
+description = "Dopo mesi di preparazione — runtime Vault su Hetzner, bridge Tailscale, trasporto stabile, DNS enterprise — la migrazione dei segreti da Infisical a Vault, completata e validata con un destroy/create da zero."
 tags = ["vault", "infisical", "eso", "external-secrets", "migration", "kubernetes", "tailscale", "crisp", "architecture"]
 categories = ["Infrastructure", "DevOps", "Architecture"]
 author = "Taz"
@@ -10,15 +10,13 @@ author = "Taz"
 
 # One Vault In, One Vault Out: Migrare Segreti Senza Fermare il Cluster
 
-C'è un test che ogni progetto infrastrutturale prima o poi affronta: quanto è doloroso sostituire il backend dei segreti in un cluster Kubernetes? La risposta dipende quasi interamente dalla qualità della progettazione che lo ha preceduto.
+Se avete seguito la storia del cluster TazLab fin qui, sapete che è una lunga marcia di avvicinamento. Il Vault su Hetzner era operativo da aprile (C1 + C2). Il ponte Tailscale che connette il cluster Proxmox/Talos al Vault era stato costruito. Il trasporto era stato stabilizzato dopo aver scoperto che l'MTU di Docker bridge faceva collassare le connessioni SSH. La risoluzione DNS dei nomi MagicDNS era stata risolta con il Tailscale Operator e un CoreDNS enterprise "Disable & Replace". Persino l'archivio crittografico di TazPod — il portafoglio di chiavi che tiene in vita l'intero ecosistema — era stato messo in sicurezza con retention history su S3.
 
-Questo articolo racconta come abbiamo sostituito Infisical con HashiCorp Vault come backend dei segreti per un cluster Kubernetes (Talos + Flux + ESO), migrando tutti i 20 segreti in una sessione, e poi certificato il tutto con un ciclo destroy/create da zero — senza un singolo intervento manuale sull'infrastruttura a ciclo avviato.
+Mancava un pezzo. L'ultimo.
 
-## Il problema
+Sostituire Infisical. Il servizio esterno free tier che ancora gestiva tutti i segreti del cluster — token API, certificati TLS, credenziali OAuth, chiavi S3 — doveva essere rimpiazzato da Vault. Non perché non funzionasse: funzionava. Ma aveva tre limiti che l'architettura non poteva più ignorare: dipendenza da un vendor esterno (nessun Infisical = cluster morto), limiti di scala del free tier, e l'impossibilità di generare segreti dinamici — un problema che avevamo già toccato con il workaround `sync_runtime_secrets` per la password di Grafana, una toppa che dimostrava esattamente perché serviva Vault.
 
-Il cluster `tazlab-k8s` gestiva tutti i segreti statici — token API, certificati TLS, credenziali OAuth, chiavi S3 — attraverso Infisical, un servizio esterno free tier. Funzionava, ma creava dipendenza da un vendor esterno, limiti di scala e impossibilità di gestire segreti dinamici.
-
-La soluzione era già in casa: Vault su Hetzner via Tailscale, con storage Raft e snapshot S3. Il runtime era operativo. Mancava il pezzo finale: far comunicare il cluster con Vault.
+Questo articolo racconta l'ultimo miglio: come abbiamo migrato tutti i 20 segreti da Infisical a Vault in una sessione, e poi certificato il tutto con un ciclo destroy/create da zero — senza un singolo intervento manuale a ciclo avviato.
 
 ## L'architettura: two-store e progettazione a slice
 
@@ -32,13 +30,13 @@ L'intero percorso è stato gestito con la metodologia CRISP, decomponendo in pro
 12-tazlab-k8s-vault-migration-followup ← Hardening bootstrap + destroy/create validation
 ```
 
-Ogni gate era una condizione verificabile: connettività cluster→Vault, store Valid, smoke test passato. Quando siamo arrivati alla migrazione, ogni dipendenza era già stata validata.
+Ogni gate era una condizione verificabile già validata nei progetti precedenti: connettività cluster→Vault via MagicDNS, ClusterSecretStore Valid, smoke test passato. Quando siamo arrivati alla migrazione, l'unica variabile era la migrazione stessa.
 
 ## La migrazione: 20 segreti in 7 wave
 
-Con i prerequisiti pronti, la migrazione è stata una sequenza di wave: una modifica YAML, commit Git, Flux reconcile, verifica `SecretSynced True`. Pilot (`GEMINI_API_KEY`), GitHub token, auth (dex + oauth2), storage AWS, wildcard TLS + 9 repliche, AI (OpenClaw), e il bonus Tailscale Operator.
+Con i prerequisiti pronti, la migrazione è stata una sequenza di wave: una modifica YAML, commit Git, Flux reconcile, verifica `SecretSynced True`. Pilot (`GEMINI_API_KEY` per mnemosyne-mcp), GitHub token, auth (dex + oauth2), storage S3, wildcard TLS + 9 repliche, AI (OpenClaw), e il bonus Tailscale Operator.
 
-Due differenze fondamentali tra Infisical e Vault:
+Due differenze fondamentali tra Infisical e Vault nell'ExternalSecret:
 
 - **`remoteRef.key`**: non più il nome piatto del segreto, ma il percorso relativo al mount KV (`tazlab-k8s/static/apps/mnemosyne-mcp/GEMINI_API_KEY`)
 - **`remoteRef.property: value`**: necessario perché Vault KV v2 restituisce JSON annidato, e `property: value` estrae il valore
@@ -47,16 +45,14 @@ Le uniche sorprese: il campo `caSecret` non esiste nel CRD di ESO (va usato `caP
 
 ## La fase 2: hardening bootstrap
 
-Con tutti i segreti su Vault, è emerso un problema più subdolo: il bootstrap del cluster dipendeva ancora da Infisical per le credenziali iniziali (token Proxmox, Talos secretbox, GitHub token). Il layer `secrets-fetcher` era un data source Infisical. Il `create.sh` esportava `INFISICAL_CLIENT_ID`.
+Con tutti i segreti su Vault, è emerso un problema più subdolo: il bootstrap del cluster dipendeva ancora da Infisical per le credenziali iniziali (token Proxmox, Talos secretbox, GitHub token). Il layer `secrets-fetcher` era un data source Infisical. Il `create.sh` esportava `INFISICAL_CLIENT_ID`. Se Infisical fosse stato dismesso, il cluster non sarebbe più nato.
 
 La soluzione è stata eliminare Infisical dalla catena di bootstrap:
-
-- `secrets-fetcher` convertito da data source Infisical a variabili da file locali
+- `secrets-fetcher` convertito da data source a variabili da file locali
 - `proxmox-talos` legge `GITHUB_TOKEN` da variabile, non da Infisical
-- `create.sh` non esporta più credenziali Infisical; esporta `TALOS_SECRETBOX_KEY`
-- `setup.sh` pusha le credenziali Operator su Vault invece che su Infisical
-- Provider Infisical rimosso da tutti i layer Terraform tranne engine (legacy store)
-- `aws-backup-secret` migrato da Infisical a Vault nel modulo storage
+- `create.sh` non esporta più credenziali Infisical
+- `setup.sh` pusha le credenziali Operator su Vault
+- Provider Infisical rimosso da tutti i layer Terraform
 - Regola architetturale documentata: Terraform = provider-specific, Flux = provider-agnostic
 
 ### Il deadlock DNS
@@ -74,13 +70,11 @@ Con tutte le dipendenze risolte, abbiamo eseguito un ciclo `destroy.sh` + `creat
 | Gitops (Flux) | 190s |
 | Storage (Longhorn) | 118s |
 
-Al termine: blog e wiki raggiungibili via HTTPS, tutte le 22 ExternalSecret `SecretSynced True`, dex e oauth2-proxy healthy, Flux DAG verde. Nessun intervento manuale durante il ciclo.
-
-L'unico intoppo: il kube-controller-manager ha perso il leader election per qualche secondo durante il bootstrap iniziale (timeout sulla API server locale), causando 3-4 riavvii prima di stabilizzarsi. Un comportamento noto su Talos a control-plane singolo, che si risolve da solo.
+Tutti i servizi sono tornati su: blog e wiki raggiungibili via HTTPS, tutte le 22 ExternalSecret `SecretSynced True`, dex e oauth2-proxy healthy. Zero interventi manuali durante il ciclo. L'unico intoppo: il kube-controller-manager ha perso il leader election per qualche secondo durante il bootstrap (timeout sulla API server locale su control-plane singolo), causando 3-4 riavvii prima di stabilizzarsi — comportamento noto su Talos, che si risolve da solo.
 
 ## Lezioni apprese
 
-**La progettazione in slice funziona.** Ogni progetto CRISP aveva un gate di uscita verificabile. Quando siamo arrivati alla migrazione, ogni dipendenza era già stata validata. Il risultato: zero rollback, zero incidenti, zero scoperte dell'ultimo minuto.
+**La progettazione in slice funziona.** È il filo rosso che attraversa tutti gli articoli di questa serie. Ogni progetto CRISP aveva un gate di uscita verificabile. Quando siamo arrivati alla migrazione, ogni dipendenza era già stata validata in un progetto precedente. Il risultato: zero rollback, zero incidenti.
 
 **Il two-store model rimuove la pressione.** Sapere che Infisical era ancora lì ha permesso di procedere senza fretta. Ogni wave poteva essere testata e rollbackata individualmente.
 
@@ -90,7 +84,7 @@ L'unico intoppo: il kube-controller-manager ha perso il leader election per qual
 
 - **22/22 ExternalSecrets** su Vault, tutti `SecretSynced True`
 - **Bootstrap Infisical-free**: il cluster nasce senza chiamare Infisical
-- **Infisical ancora vivo** per consumer esterni (TazPod), decommission pianificata
+- **Infisical ancora vivo** per consumer esterni (TazPod), dismissione pianificata
 - **Destroy/create validato**: cluster ricreato da zero senza interventi manuali
 
-La migrazione è completa. I segreti dinamici PostgreSQL e la dismissione di Infisical sono rinviati a progetti successivi — ma questa è un'altra storia.
+La migrazione è completa. I segreti dinamici PostgreSQL e la dismissione di Infisical sono rinviati a progetti successivi. Ma questa è un'altra storia.
