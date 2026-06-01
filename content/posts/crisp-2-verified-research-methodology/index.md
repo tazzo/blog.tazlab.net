@@ -1,6 +1,6 @@
 +++
 title = "CRISP 2.0: Mandatory Research, Verified Plans, Zero Assumptions"
-date = 2026-06-01T00:30:00+02:00
+date = 2026-06-01T07:30:00+02:00
 draft = false
 description = "After theorizing the CRISP cycle in the previous post, I formalized it into a concrete workflow and tested it on three Vault migration projects in one afternoon. The result: zero bugs, zero redesign, three projects completed. Here is how it went."
 tags = ["crisp", "methodology", "vso", "vault", "kubernetes", "deep-research", "workflow", "infrastructure", "enterprise"]

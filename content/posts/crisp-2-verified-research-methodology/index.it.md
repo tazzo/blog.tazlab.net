@@ -1,6 +1,6 @@
 +++
 title = "CRISP 2.0: Ricerca Obbligatoria, Piano Verificato, Zero Assunzioni"
-date = 2026-06-01T00:30:00+02:00
+date = 2026-06-01T07:30:00+02:00
 draft = false
 description = "Dopo aver teorizzato il ciclo CRISP nel post precedente, l'ho formalizzato in un workflow concreto e l'ho testato su tre progetti di migrazione Vault in un pomeriggio. Il risultato: zero bug, zero redesign, tre progetti completati. Ecco com'è andata."
 tags = ["crisp", "methodology", "vso", "vault", "kubernetes", "deep-research", "workflow", "infrastructure", "enterprise"]
