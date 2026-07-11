@@ -1,5 +1,5 @@
 +++
-title = "Third Stop: pgAdmin to mTLS"
+title = "Completing the PKI: pgAdmin mTLS and the Vault Cleanup"
 date = 2026-07-08T23:00:00+02:00
 draft = false
 description = "After Grafana and mnemosyne, it's pgAdmin's turn: the last cluster app to switch to PostgreSQL client certificate authentication. A straightforward project with no code changes, one surprise about pg_hba rules, and a forgotten kustomization entry."
