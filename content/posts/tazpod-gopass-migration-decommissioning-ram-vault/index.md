@@ -133,3 +133,5 @@ The migration from a custom RAM Vault architecture to a gopass and GPG-based sys
 1. **Don't reinvent the wheel**: Standard Linux cryptographic systems (`gpg`, `gpg-agent`, `pass`) solved caching and TTY management issues decades ago. Utilizing these tools drastically reduces the lines of custom code to maintain in the CLI.
 2. **Zero-Privilege Security**: Removing `SYS_ADMIN` and `sudo` requirements within our workspaces isolates the development container further from the host, reducing the impact of potential container vulnerabilities.
 3. **Prepare for AI Agents**: Configuring systems under the assumption that the terminal user might be an AI agent (and thus limiting the blast radius through partitioned secrets and targeted unlocks) not only protects against future attacks but also enforces a clean, elegant design that benefits human operators as well.
+
+sails
