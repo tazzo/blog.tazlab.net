@@ -94,7 +94,7 @@ Progettazione e sviluppo di sistemi di Intelligenza Artificiale per la diagnosti
 
 ## Competenze Tecniche
 
-**Platform Engineering & Cloud-Native:** Proxmox VE come base + infrastruttura interamente IaC: Terraform/Terragrunt (cluster, VM, LXC), Ansible (configurazione e installazione tooling, playbook idempotenti) e GitOps con Flux CD per il cluster; Kubernetes (Talos Linux), Docker/Podman, Helm, Kustomize, CI/CD (GitHub Actions); ambiente distruggibile e ricreabile in pochi minuti, dati persistenti su S3; storage distribuito (Longhorn), osservabilità (Prometheus, Grafana, alerting).
+**Platform Engineering & Cloud-Native:** Proxmox VE come base + infrastruttura interamente IaC: Terraform/Terragrunt (cluster, VM, LXC), Ansible (configurazione e installazione tooling, playbook idempotenti) e GitOps con Flux CD per il cluster; Kubernetes (Talos Linux), Docker/Podman, Helm, CI/CD (GitHub Actions); ambiente distruggibile e ricreabile in pochi minuti, dati persistenti su S3; storage distribuito (Longhorn), osservabilità (Prometheus, Grafana, alerting).
 
 **MLOps & AI Infrastructure:** Deploy containerizzato di servizi di inferenza e memoria semantica su Kubernetes; PostgreSQL + pgvector (embeddings, ricerca vettoriale); protocollo MCP (server e client); operatività LLM end-to-end (Hindsight, Mnemosyne): migrazione e audit di basi di conoscenza, gestione di quota e rate-limit, monitoraggio e recovery; orchestrazione di agenti AI integrati in processi GitOps/CI-CD.
 
@@ -105,5 +105,3 @@ Progettazione e sviluppo di sistemi di Intelligenza Artificiale per la diagnosti
 **Cloud Provider:** AWS, Hetzner (in produzione), Google Cloud, Cloudflare, Oracle Cloud (OCI).
 
 **AI Agents — uso professionale attivo:** Claude Code, Codex, OpenCode, Pi, Gemini, OMP e gli orchestratori di agenti self-hosted *Paperclip*, *Buzz* e *Multica*: impiegati quotidianamente per progettare, implementare e mantenere infrastrutture e processi reali, non solo come assistenti di coding.
-
-*Questa pagina è generata dallo stesso documento sorgente delle esportazioni PDF e HTML realizzate con RenderCV.*

@@ -105,5 +105,3 @@ Design and development of Artificial Intelligence systems for medical diagnostic
 **Cloud Providers:** AWS (S3, IAM, SSO), Hetzner (in production), Google Cloud (Gemini API), Cloudflare, Oracle Cloud (OCI).
 
 **AI Agents — active professional use:** Claude Code, Codex, OpenCode, Pi, Gemini, OMP and the self-hosted agent orchestrators *Paperclip*, *Buzz* and *Multica*: used daily to design, implement and maintain real infrastructure and processes, not just as coding assistants.
-
-*This page is generated from the same source document as the PDF and HTML exports rendered with RenderCV.*
