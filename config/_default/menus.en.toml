@@ -16,8 +16,8 @@
   weight = 5
 
 [[main]]
-  name = "Blog"
-  pageRef = "posts"
+  name = "CV"
+  pageRef = "cv"
   weight = 10
 
 [[main]]
