@@ -29,7 +29,7 @@ An agent orchestrator with an audit trail, in a single binary: it starts the han
 
 ### **TazLab — Cloud-Native & AI Engineering platform** -- **Personal project**
 
-Jan 2025 – present
+Aug 2025 – present
 
 A personal project that grew from a single Docker-container server into an enterprise-grade platform (~80 pods): the jump came from professional use of AI agents, employed to design, implement and maintain the whole infrastructure.
 
