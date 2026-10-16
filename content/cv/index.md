@@ -17,20 +17,28 @@ showPagination = false
 
 ## Projects
 
-### **TazLab — Cloud-Native & AI Engineering platform, designed, built and maintained with AI agents** -- **Personal project**
+### **Ambrogio — Personal Agent Orchestrator** -- **Personal project**
+
+An agent orchestrator with an audit trail, in a single binary: it starts the hands, spreads the work over queues of steps and keeps every step. Site: [ambrogio.tazlab.net](https://ambrogio.tazlab.net).
+
+- **Internal and external agents**: internal agents read and search inside the engine; external ones are *piloted* — the engine starts them, with a queue slot, a work order and a deadline — or *free*, with a work order taken by an outside hand. Codex, Claude Code, OpenCode and the rest keep working unchanged.
+- **Tasks and queues**: a request becomes a queue of steps with a declared ceiling; the engine holds the chain and the trace — who, what, when, and why the queue was closed.
+- **GitHub**: the worker commits in its own worktree and delivers; the engine pushes the branch, opens the pull request, merges it after the check and brings the local trunk up — a hand never holds the forge's credential.
+- **Security and secrets**: every hand runs in a *Landlock* sandbox (declared read and write paths, network and IPC restricted), clean and with a deadline: it receives only the secrets of its project (`global` + `project`), never the engine's.
+- **Projects, documents and one binary**: a project is a place with a root, documents are the texts a hand writes (plan, roadmap, status, revisions), deliveries are reports with verifiable artifacts. Static Go with SQLite inside, page, API and events served by the binary; the operator's door behind a token, the agents' door.
+
+### **TazLab — Cloud-Native & AI Engineering platform** -- **Personal project**
 
 Jan 2025 – present
 
-A personal project that grew from a single Docker-container server into an enterprise-grade platform (~80 pods): the leap was made possible by the professional use of AI agents, actively employed to design, implement and maintain the entire infrastructure.
+A personal project that grew from a single Docker-container server into an enterprise-grade platform (~80 pods): the jump came from professional use of AI agents, employed to design, implement and maintain the whole infrastructure.
 
-- **GitOps Kubernetes platform**: multi-node cluster on Talos Linux (Proxmox VMs) managed with Flux CD and Terraform/Terragrunt; one-shot bootstrap from bare metal to a fully working cluster in ~12 minutes with zero manual intervention.
-- **Fully IaC infrastructure**: Proxmox (local base) + Terraform/Terragrunt for cluster, VMs and LXCs + Ansible (configuration and tooling installation, idempotent playbooks); every component can be destroyed and recreated in minutes — data lives on S3.
-- **Enterprise secrets & PKI**: HashiCorp Vault as the single secrets backend (dynamic secrets with Vault Secrets Operator), 3-tier PKI with an offline Root CA, mTLS on PostgreSQL with automatic certificate rotation — zero application passwords.
-- **Zero-trust & disaster recovery**: Tailscale network as code with no public IPs; offsite S3 backups, autonomous recovery after a real power outage (~10 min), full recovery from zero in <30 min.
-- **AI Engineering**: developed *Mnemosyne* (Go MCP server, pgvector semantic memory) and integrated *Hindsight* (multi-agent memory, 745+ memories migrated); *TazPod* (Go CLI) as a workspace with always-on agents on Proxmox, reachable remotely over SSH/Tailscale — including a dedicated VM running the *Hermes* agent.
-- **Professional use of AI agents**: Claude Code, Codex, OpenCode, Pi, Gemini and OMP not as isolated tools but embedded into real processes (GitOps, CI/CD, shared multi-agent memory), including the ability to build the infrastructure that runs them and keep it maintained.
-- **Documentation & history**: [wiki.tazlab.net](https://wiki.tazlab.net) for infrastructure documentation; [blog.tazlab.net](https://blog.tazlab.net) as the engineering and development history.
-- **AI agent orchestration**: self-hosted control planes on Kubernetes for multiple agent orchestrators — *Multica* and *Buzz*; first task completed in 29 s.
+- **Kubernetes GitOps**: multi-node Talos Linux cluster (Proxmox VMs) with Flux CD and Terraform/Terragrunt; one-shot bootstrap in ~12 minutes, with no manual work.
+- **Fully IaC infrastructure**: Proxmox, Terraform/Terragrunt (cluster, VMs, LXCs), Ansible (idempotent playbooks); every component can be destroyed and recreated in minutes, with data persistent on S3.
+- **Secrets, PKI and zero-trust**: HashiCorp Vault as the single backend (dynamic secrets, Vault Secrets Operator), 3-tier PKI with an offline Root CA, mTLS on PostgreSQL with automatic rotation — zero application passwords; Tailscale network as code with no public IPs.
+- **Disaster recovery**: offsite S3 backups, autonomous recovery after a real power outage (~10 min), full recovery from zero in <30 min.
+- **AI Engineering**: *Mnemosyne* (Go MCP server, pgvector semantic memory), *Hindsight* (multi-agent memory, 745+ memories), *Ambrogio* (agent orchestrator, Go); *TazPod* (Go CLI) as a workspace with AI agents on Proxmox VMs — one dedicated to the *Hermes* agent — reachable over SSH/Tailscale.
+- **AI agents inside the process**: Claude Code, Codex, OpenCode, Pi, Gemini and OMP within GitOps, CI/CD and multi-agent memory; *Multica* and *Buzz* as self-hosted control planes on Kubernetes. Documentation on [wiki.tazlab.net](https://wiki.tazlab.net) and [blog.tazlab.net](https://blog.tazlab.net).
 
 ## Work Experience
 
