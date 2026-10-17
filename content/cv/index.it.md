@@ -19,13 +19,13 @@ showPagination = false
 
 ### **Ambrogio — Personal Agent Orchestrator** -- **Progetto personale**
 
-Orchestratore di agenti AI e registro di tracciabilità in un solo binario: avvia le mani, distribuisce il lavoro in code di passi e conserva ogni passaggio. Sito: [ambrogio.tazlab.net](https://ambrogio.tazlab.net).
+Orchestratore di agenti AI e registro di tracciabilità in un solo binario: avvia gli agenti, distribuisce il lavoro in code di task e conserva ogni passaggio. Sito: [ambrogio.tazlab.net](https://ambrogio.tazlab.net).
 
-- **Agenti interni ed esterni**: gli interni leggono e cercano nel motore; gli esterni sono *pilotati* — avviati dal motore, con posto in coda, ordine di lavoro e scadenza — o *liberi*, con un ordine preso da una mano esterna. Claude Code, Codex, OpenCode o altro restano usabili com'è.
-- **Task e code**: una richiesta diventa una coda di passi con un tetto dichiarato; il motore tiene la catena e la traccia — chi, cosa, quando, e perché la coda si è chiusa.
-- **GitHub**: il worker committa nel suo albero e consegna; il motore spinge il ramo, apre la pull request, la fonde dopo il controllo e riporta il tronco locale — una mano non ha la credenziale della forgia.
-- **Sicurezza e segreti**: ogni mano gira in una sandbox *Landlock* (percorsi dichiarati, rete e IPC ristretti), pulita e con scadenza: riceve solo i segreti del suo progetto (`global` + `project`), mai quelli del motore.
-- **Progetti, documenti e un solo binario**: un progetto è un posto con una radice, i documenti i testi che una mano scrive (piano, roadmap, stato, revisioni), le consegne rapporti con artefatti verificabili. Go statico con SQLite dentro, pagina, API ed eventi dal binario; porta dell'operatore dietro token, porta degli agenti.
+- **Agenti interni ed esterni**: gli interni leggono e cercano nel motore; gli esterni sono *pilotati* — avviati dal motore, con posto in coda, ordine di lavoro e scadenza — o *liberi*, con un ordine preso da un agente esterno. Claude Code, Codex, OpenCode o altro restano usabili com'è.
+- **Task e code**: una richiesta diventa una coda di task con un tetto dichiarato; il motore tiene la catena e la traccia — chi, cosa, quando, e perché la coda si è chiusa.
+- **GitHub**: il worker committa nel suo albero e consegna; il motore spinge il ramo, apre la pull request, la fonde dopo il controllo e riporta il tronco locale — un agente non ha la credenziale della forgia.
+- **Sicurezza e segreti**: ogni agente gira in una sandbox *Landlock* (percorsi dichiarati, rete e IPC ristretti), pulita e con scadenza: riceve solo i segreti del suo progetto (`global` + `project`), mai quelli del motore.
+- **Progetti, documenti e un solo binario**: un progetto è un posto con una radice, i documenti i testi che un agente scrive (piano, roadmap, stato, revisioni), le consegne rapporti con artefatti verificabili. Go statico con SQLite dentro, pagina, API ed eventi dal binario; porta dell'operatore dietro token, porta degli agenti.
 
 ### **TazLab — piattaforma Cloud-Native & AI Engineering** -- **Progetto personale**
 

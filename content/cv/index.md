@@ -19,13 +19,13 @@ showPagination = false
 
 ### **Ambrogio — Personal Agent Orchestrator** -- **Personal project**
 
-An agent orchestrator with an audit trail, in a single binary: it starts the hands, spreads the work over queues of steps and keeps every step. Site: [ambrogio.tazlab.net](https://ambrogio.tazlab.net).
+An agent orchestrator with an audit trail, in a single binary: it starts the agents, spreads the work over queues of tasks and keeps every step. Site: [ambrogio.tazlab.net](https://ambrogio.tazlab.net).
 
-- **Internal and external agents**: internal agents read and search inside the engine; external ones are *piloted* — the engine starts them, with a queue slot, a work order and a deadline — or *free*, with a work order taken by an outside hand. Codex, Claude Code, OpenCode and the rest keep working unchanged.
-- **Tasks and queues**: a request becomes a queue of steps with a declared ceiling; the engine holds the chain and the trace — who, what, when, and why the queue was closed.
-- **GitHub**: the worker commits in its own worktree and delivers; the engine pushes the branch, opens the pull request, merges it after the check and brings the local trunk up — a hand never holds the forge's credential.
-- **Security and secrets**: every hand runs in a *Landlock* sandbox (declared read and write paths, network and IPC restricted), clean and with a deadline: it receives only the secrets of its project (`global` + `project`), never the engine's.
-- **Projects, documents and one binary**: a project is a place with a root, documents are the texts a hand writes (plan, roadmap, status, revisions), deliveries are reports with verifiable artifacts. Static Go with SQLite inside, page, API and events served by the binary; the operator's door behind a token, the agents' door.
+- **Internal and external agents**: internal agents read and search inside the engine; external ones are *piloted* — the engine starts them, with a queue slot, a work order and a deadline — or *free*, with a work order taken by an outside agent. Codex, Claude Code, OpenCode and the rest keep working unchanged.
+- **Tasks and queues**: a request becomes a queue of tasks with a declared ceiling; the engine holds the chain and the trace — who, what, when, and why the queue was closed.
+- **GitHub**: the worker commits in its own worktree and delivers; the engine pushes the branch, opens the pull request, merges it after the check and brings the local trunk up — an agent never holds the forge's credential.
+- **Security and secrets**: every agent runs in a *Landlock* sandbox (declared read and write paths, network and IPC restricted), clean and with a deadline: it receives only the secrets of its project (`global` + `project`), never the engine's.
+- **Projects, documents and one binary**: a project is a place with a root, documents are the texts an agent writes (plan, roadmap, status, revisions), deliveries are reports with verifiable artifacts. Static Go with SQLite inside, page, API and events served by the binary; the operator's door behind a token, the agents' door.
 
 ### **TazLab — Cloud-Native & AI Engineering platform** -- **Personal project**
 
