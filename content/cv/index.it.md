@@ -19,13 +19,17 @@ showPagination = false
 
 ### **Ambrogio — Personal Agent Orchestrator** -- **Progetto personale**
 
-Orchestratore di agenti AI e registro di tracciabilità in un solo binario: avvia gli agenti, distribuisce il lavoro in code di task e conserva ogni passaggio. Sito: [ambrogio.tazlab.net](https://ambrogio.tazlab.net).
+**Il problema**: lavorare con molti agenti — alcuni pilotati, altri i terminali che si usano normalmente (Codex, Claude Code) — e tenere traccia di cosa stanno facendo: chi lavora su cosa, dove è arrivato, diviso per progetto, con un posto solo dove guardare i risultati e i repository in ordine, senza confusione.
 
-- **Agenti interni ed esterni**: gli interni leggono e cercano nel motore; gli esterni sono *pilotati* — avviati dal motore, con posto in coda, ordine di lavoro e scadenza — o *liberi*, con un ordine preso da un agente esterno. Claude Code, Codex, OpenCode o altro restano usabili com'è.
-- **Task e code**: una richiesta diventa una coda di task con un tetto dichiarato; il motore tiene la catena e la traccia — chi, cosa, quando, e perché la coda si è chiusa.
-- **GitHub**: il worker committa nel suo albero e consegna; il motore spinge il ramo, apre la pull request, la fonde dopo il controllo e riporta il tronco locale — un agente non ha la credenziale della forgia.
-- **Sicurezza e segreti**: ogni agente gira in una sandbox *Landlock* (percorsi dichiarati, rete e IPC ristretti), pulita e con scadenza: riceve solo i segreti del suo progetto (`global` + `project`), mai quelli del motore.
-- **Progetti, documenti e un solo binario**: un progetto è un posto con una radice, i documenti i testi che un agente scrive (piano, roadmap, stato, revisioni), le consegne rapporti con artefatti verificabili. Go statico con SQLite dentro, pagina, API ed eventi dal binario; porta dell'operatore dietro token, porta degli agenti.
+**Come lo risolve**: Ambrogio è un orchestratore di agenti AI e un registro di tracciabilità in un solo binario. Gli agenti esterni si usano nativamente e si interfacciano con lui lavorando i task e producendo i documenti finali — Ambrogio tiene il tracciato. Per lavori più semplici, o per qualunque motivo, è Ambrogio a creare un agente pilotato che fa il lavoro. Sito: [ambrogio.tazlab.net](https://ambrogio.tazlab.net).
+
+**Com'è strutturato**: progetti, e dentro ogni progetto i task diventano code di task con un tetto dichiarato; il motore tiene la catena e la traccia — chi, cosa, quando, e perché la coda si è chiusa.
+
+**Un agente centrale, un solo binario**: niente installazione; cronjob interni lanciano agenti interni o esterni — gli interni leggono e cercano nel motore, gli esterni restano i terminali di sempre; alcuni cronjob servono al sistema per tenere tutto in ordine, altri si configurano per compiti di routine sui progetti.
+
+- **GitHub**: il worker committa nel suo albero e consegna; il motore spinge il ramo, apre la pull request, la fonde dopo il controllo e riporta il tronco locale — un agente non ha la credenziale di GitHub.
+- **Sandbox e segreti**: ogni agente gira in una sandbox *Landlock* (percorsi dichiarati, rete e IPC ristretti), pulita e con scadenza: riceve solo i segreti del suo progetto (`global` + `project`), mai quelli del motore.
+- **Progetti, documenti e le due porte**: un progetto è un posto con una radice, i documenti i testi che un agente scrive (piano, roadmap, stato, revisioni), le consegne rapporti con artefatti verificabili. Go statico con SQLite dentro, pagina, API ed eventi dal binario; porta dell'operatore dietro token, porta degli agenti.
 
 ### **TazLab — piattaforma Cloud-Native & AI Engineering** -- **Progetto personale**
 
