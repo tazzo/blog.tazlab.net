@@ -6,6 +6,8 @@ description = "A practical comparison after installing and using three systems t
 tags = ["agents", "orchestration", "paperclip", "multica", "buzz", "kubernetes", "nostr", "devops"]
 author = "Tazzo"
 +++
+> **Update (2026-10-19):** Paperclip and Buzz have both been decommissioned and uninstalled; this article is kept as a record of the comparison.
+
 
 ## Why I Ended Up Trying Three of Them
 
