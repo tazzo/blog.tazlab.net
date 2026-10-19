@@ -6,6 +6,8 @@ description = "Cronaca tecnica di un esperimento con un orchestratore di agenti:
 tags = ["paperclip", "agenti", "orchestrazione", "lxc", "proxmox", "sicurezza"]
 author = "Tazzo"
 +++
+> **Aggiornamento (2026-10-19):** Paperclip è stato dismesso e disinstallato; questo articolo resta come testimonianza dell'esperimento.
+
 
 ## Il problema non è il numero di agenti
 

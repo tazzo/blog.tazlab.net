@@ -6,6 +6,8 @@ description = "A technical account of an experiment with an agent orchestrator: 
 tags = ["paperclip", "agents", "orchestration", "lxc", "proxmox", "security"]
 author = "Tazzo"
 +++
+> **Update (2026-10-19):** Paperclip has been decommissioned and uninstalled; this article is kept as a record of the experiment.
+
 
 ## The Problem Is Not the Number of Agents
 
