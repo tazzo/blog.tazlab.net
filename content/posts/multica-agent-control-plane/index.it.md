@@ -1,6 +1,6 @@
 +++
 title = "Multica: come ho integrato un piano di controllo per agenti nel laboratorio, e cosa ne penso dopo l'uso"
-date = 2026-10-19T07:17:00+02:00
+date = 2026-10-03T05:00:00+02:00
 draft = false
 description = "Le scelte con cui ho portato Multica dentro il laboratorio — il cluster condiviso, l'identità a certificato, i segreti da Vault, le patch al chart, il daemon su CT106 e la squadra di agenti dichiarata in Git — e la mia valutazione dopo averlo usato per davvero."
 tags = ["multica", "agenti", "orchestrazione", "kubernetes", "gitops", "flux", "vault", "mtls", "postgresql", "devops"]

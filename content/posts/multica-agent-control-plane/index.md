@@ -1,6 +1,6 @@
 +++
 title = "Multica: How I Integrated an Agent Control Plane into the Lab, and What I Think of It After Using It"
-date = 2026-10-19T07:17:00+02:00
+date = 2026-10-03T05:00:00+02:00
 draft = false
 description = "The choices that brought Multica into the lab — the shared cluster, certificate identity, secrets from Vault, the patches to the chart, the daemon on CT106 and the agent team declared in Git — and my assessment after actually using it."
 tags = ["multica", "agents", "orchestration", "kubernetes", "gitops", "flux", "vault", "mtls", "postgresql", "devops"]
