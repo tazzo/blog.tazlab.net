@@ -6,6 +6,8 @@ description = "Le scelte con cui ho portato Multica dentro il laboratorio — il
 tags = ["multica", "agenti", "orchestrazione", "kubernetes", "gitops", "flux", "vault", "mtls", "postgresql", "devops"]
 author = "Tazzo"
 +++
+> **Aggiornamento (2026-10-20):** Multica è stato dismesso e disinstallato; questo articolo resta come testimonianza dell'esperimento.
+
 
 ## Da dove parte questo articolo
 

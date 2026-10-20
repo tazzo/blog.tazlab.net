@@ -6,6 +6,8 @@ description = "The choices that brought Multica into the lab — the shared clus
 tags = ["multica", "agents", "orchestration", "kubernetes", "gitops", "flux", "vault", "mtls", "postgresql", "devops"]
 author = "Tazzo"
 +++
+> **Update (2026-10-20):** Multica has been decommissioned and uninstalled; this article is kept as a record of the experiment.
+
 
 ## Where This Article Starts
 
