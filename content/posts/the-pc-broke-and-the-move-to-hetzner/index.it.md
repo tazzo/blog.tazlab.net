@@ -7,21 +7,13 @@ tags = ["kubernetes", "gitops", "fluxcd", "terraform", "hetzner", "disaster-reco
 author = "Tazzo"
 +++
 
-> **Nota di lavorazione:** Questa bozza documenta la cronaca dell'incidente hardware, la migrazione d'emergenza su Hetzner Cloud e l'audit architetturale che ha confermato la validità del disaccoppiamento tra Terraform e Flux.
+## Il crash annunciato e il banco di prova
 
-## Introduzione: Il crash annunciato e il banco di prova
+Il **Castello Effimero** è nato su una promessa verificabile: un'infrastruttura nomade, riproducibile e stateless, capace di rinascere da zero ovunque ci sia una connessione di rete. La separazione netta tra il livello di provisioning fisico e quello applicativo — a Terraform il compito di preparare il terreno, a Flux CD quello di popolare e governare il castello — era la parte di quella promessa che nessun test aveva ancora messo alla prova.
 
-Negli articoli precedenti dedicati alla visione del **Castello Effimero**, ho descritto a lungo l'obiettivo fondante del mio homelab: costruire un'infrastruttura nomade, riproducibile e stateless, capace di rinascere da zero ovunque ci sia una connessione di rete e in tempi minimi. L'idea teorica era chiara: separare drasticamente il livello di provisioning fisico da quello applicativo. A Terraform il compito di preparare il terreno; a Flux CD il compito di popolare e governare il castello.
+Il 27 ottobre 2026 la prova è arrivata da sola. Il computer desktop che ospitava il cluster di casa — un nodo Proxmox VE su cui giravano le macchine virtuali Talos Linux e i container di servizio — si è spento per surriscaldamento: nessun guasto al disco, nessun errore software, nessun aggiornamento fallito. L'hardware fisico non ha più retto lo sforzo termico ed è entrato in spegnimenti di protezione a singhiozzo, dopo pochi minuti di accensione. Davanti a un PC che collassa così, le strade possibili erano due: tentare un accanimento terapeutico fatto di smontaggi, ventole di emergenza e manutenzioni locali, oppure **migrare l'intero cluster sul cloud Hetzner**.
 
-Il 27 ottobre 2026, la teoria è stata bruscamente chiamata a confrontarsi con la realtà. 
-
-Il computer desktop che ospitava il cluster di casa (un nodo Proxmox VE su cui giravano le macchine virtuali Talos Linux e i container di servizio) si è spento improvvisamente per surriscaldamento. Nessun guasto al disco, nessun errore software o aggiornamento fallito: semplicemente, l'hardware fisico non ha più retto lo sforzo termico, entrando in spegnimento di protezione a singhiozzo. 
-
-Di fronte a un PC che collassa dopo pochi minuti di accensione, le strade possibili erano due: tentare un accanimento terapeutico fatto di smontaggi, ventole di emergenza e manutenzioni locali, oppure premere il grilletto del piano nomade e **migrare l'intero cluster sul cloud Hetzner**.
-
-Non abbiamo impiegato giorni per completare la transizione: **sono bastate circa due ore di lavoro effettivo**. 
-
-Non si tratta di presunzione o di un colpo di fortuna: il risultato è la diretta conseguenza di scelte architetturali deliberate e pianificate con mesi di anticipo. L'incidente ci ha obbligato a mettere in pratica quello che avevamo preventivato di affrontare fin dall'inizio. L'unico motivo per cui sono servite due ore e non pochi minuti risiedeva nel fatto che lo strato Terraform per Hetzner non era ancora stato completamente rifinito e collaudato. Una volta steso quel terreno con Terraform, Flux ha ripristinato l'intera flotta applicativa in modo quasi istantaneo e praticamente indolore.
+Ho scelto la seconda. La transizione non è durata giorni: **sono bastate circa due ore di lavoro effettivo**, e la ragione di quella durata è la parte più utile del racconto. Lo strato Terraform per Hetzner non era ancora stato completamente rifinito e collaudato; una volta steso quel terreno, Flux ha ripristinato l'intera flotta applicativa in modo quasi istantaneo. Non è presunzione né colpo di fortuna: è la diretta conseguenza di scelte architetturali deliberate, pianificate con mesi di anticipo.
 
 ---
 

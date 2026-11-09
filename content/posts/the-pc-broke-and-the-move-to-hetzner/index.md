@@ -7,21 +7,13 @@ tags = ["kubernetes", "gitops", "fluxcd", "terraform", "hetzner", "disaster-reco
 author = "Tazzo"
 +++
 
-> **Working Note:** This draft documents the chronicle of the hardware failure, the emergency migration to Hetzner Cloud, and the architectural audit that confirmed the validity of decoupling Terraform and Flux.
+## The Foreseen Crash and the Proving Ground
 
-## Introduction: The Foreseen Crash and the Proving Ground
+The **Ephemeral Castle** was born on a verifiable promise: a nomadic, reproducible, and stateless infrastructure capable of rising from scratch wherever a network connection exists. The clean separation between the physical provisioning layer and the application layer — Terraform to prepare the ground, Flux CD to populate and govern the castle — was the part of that promise no test had yet put to the proof.
 
-In previous articles dedicated to the vision of the **Ephemeral Castle**, I described at length the founding objective of my homelab: building a nomadic, reproducible, and stateless infrastructure capable of rising from scratch wherever a network connection exists, in minimal time. The theoretical premise was straightforward: drastically separate the physical provisioning layer from the application layer. Terraform prepares the ground; Flux CD populates and governs the castle.
+On October 27, 2026, the test arrived on its own. The desktop computer hosting the home cluster — a Proxmox VE node running Talos Linux virtual machines and service containers — shut down due to overheating: no disk failure, no software error, no failed upgrade. The physical hardware could no longer sustain the thermal strain and entered intermittent protective shutdowns within minutes of powering on. Faced with a PC collapsing like that, two paths lay open: therapeutic obstinacy with disassembly, emergency fans, and local repairs, or **migrating the entire cluster to Hetzner Cloud**.
 
-On October 27, 2026, theory was abruptly called to face reality.
-
-The desktop computer hosting the home cluster (a Proxmox VE node running Talos Linux virtual machines and service containers) shut down unexpectedly due to overheating. No disk failure, no software error, no failed upgrade: the physical hardware simply could no longer handle the thermal strain, tripping into intermittent protective power-offs.
-
-Faced with a PC collapsing within minutes of powering on, two paths lay open: attempt therapeutic obstinacy with disassembly, emergency fans, and local repairs, or pull the trigger on the nomadic plan and **migrate the entire cluster to Hetzner Cloud**.
-
-We did not spend days completing the transition: **it took roughly two hours of active work**.
-
-This was neither arrogance nor a stroke of luck: the outcome was the direct consequence of deliberate architectural choices planned months in advance. The incident forced us into practice with what we had planned to tackle from the very beginning. The sole reason it took two hours rather than a few minutes was that the Terraform layer for Hetzner had not yet been fully polished and tested. Once that ground was laid with Terraform, Flux restored the entire application fleet almost instantly and virtually painlessly.
+I took the second. The transition did not take days: **roughly two hours of active work were enough**, and the reason for that duration is the most useful part of the story. The Terraform layer for Hetzner had not yet been fully polished and tested; once that ground was laid, Flux restored the entire application fleet almost instantly. This is neither arrogance nor a stroke of luck: it is the direct consequence of deliberate architectural choices, planned months in advance.
 
 ---
 
