@@ -10,52 +10,52 @@ showReadingTime = false
 showPagination = false
 +++
 
-From the beginnings of the first electronic circuits to Kubernetes orchestration, my constant has always been only one: never accepting that a system works without having deeply understood its internal logic. Whether it's hardware or the command line, my goal has always been to master the system, understand its deep mechanisms, and, where possible, push its limits a little further.
+From the first electronic circuits to Kubernetes orchestration, the thread running through my path has always been the same: never accepting that a system works without having understood its internal logic. Whether it is hardware or the command line, the goal has each time been to master the system, understand its deeper mechanisms and, where possible, push its limits a little further.
 
-Today many talk about Artificial Intelligence and Cloud as absolute novelties, but those who have experienced the evolution of bits "under the hood" are witnessing an extraordinary convergence. In this post, I want to tell you how I went from the screech of the 56k modem to the orchestration of a Kubernetes cluster in my living room.
+Today Artificial Intelligence and the Cloud are presented as absolute novelties. Those who have followed the evolution of the bits under the hood, however, recognise in them a convergence with what came before. On this page I describe how I went from the screech of the 56k modem to the orchestration of a Kubernetes cluster in my living room.
 
 ## **AI Before Power: The Era of SVMs (1999-2001)**
 
-At the end of the 90s, Artificial Intelligence was a challenge against the limits of physics. The computing power of that time did not allow classical neural networks to converge in reasonable times.
+At the end of the 1990s, Artificial Intelligence was, before being a matter of algorithms, a problem of physical limits: the computing power available did not allow classical neural networks to converge in reasonable times.
 
-In my degree thesis in **Physics**, I addressed this limit by using **Support Vector Machines (SVM)** for the early diagnosis of radiographic tumors. The algorithms were written in **C and C++** for maximum performance, with a **Java** interface. It was an era when AI was built with pure mathematics.
+In my degree thesis in **Physics** I addressed that constraint with **Support Vector Machines (SVM)**, applied to the early diagnosis of radiographic tumors. The algorithms were written in **C and C++** for maximum performance, with an interface in **Java**. It was an era in which AI was built with pure mathematics.
 
-## **Slackware, RedHat, and the Modem's Screech**
+## **Slackware, RedHat and the 56k Modem**
 
-In those same years, I discovered **Linux**. There were no YouTube tutorials; there were manuals and newsgroups. I installed the first versions of **RedHat** and **Slackware**, configuring kernels while the outside world was connected via the twisted pair telephone line and the screech of the 56k modem. There I learned how an operating system "thinks."
+In those same years I was discovering **Linux**. There were no YouTube tutorials: there were manuals and newsgroups. I installed the first versions of **RedHat** and **Slackware** and configured kernels while the outside world arrived through the twisted-pair telephone line and the screech of the 56k modem. That is where I learned how an operating system works, from the inside.
 
 ## **From the Semantic Web to Enterprise Consulting**
 
-After an **IT Master's** focused on the internet stack and the **Semantic Web** (the idea of making data understandable to machines), I arrived in Milan. Those were the years of "heavyweight" consulting in **Java**, where the modernity of JavaBeans had to communicate with **COBOL** systems and critical SQL databases. An incredible training ground for understanding the management of complexity on a large scale.
+After an **IT Master's** dedicated to the internet stack and the **Semantic Web** — the idea of making data understandable to machines — I arrived in Milan. Those were the years of enterprise consulting in **Java**, where the modernity of JavaBeans had to talk to **COBOL** systems and to critical SQL databases. A training ground for understanding how complexity is governed at large scale.
 
-## **The Duality: Teaching and Web Development**
+## **Teaching and Web Development**
 
-My path then veered towards teaching Mathematics and Physics. But I never stopped being a developer. During my teaching qualification process, I worked as a **JavaScript and PHP** programmer, staying connected with the world of the dynamic web.
+The path then moved to teaching Mathematics and Physics, without my ever stopping doing development. During the teaching qualification I worked as a **JavaScript and PHP** programmer, keeping contact with the dynamic web.
 
-In these years, I understood that learning a new language (**Python, Haskell, Rust, XML**) is a very fast process if you understand its **paradigms**. Once you understand the logic (functional, imperative, object-oriented), the difference is almost only syntax.
+In those years I understood that learning a new language (**Python, Haskell, Rust, XML**) is a rapid process if you understand its **paradigms**. Once the logic is clear (functional, imperative, object-oriented), the difference between one language and another is largely syntax.
 
-## **The Spark: AI as a Study Companion**
+## **AI as a Teaching Tool**
 
-The circle began to close with the advent of the new LLMs. Initially, I used AI for educational purposes: creating personalized materials for my students and, especially, teaching them how to use AI to **improve learning** and not to "cheat."
+The circle began to close with the arrival of the new LLMs. At first I used AI for teaching: preparing customised materials for my students and, above all, teaching them to use AI to **improve learning** and not to get around the work.
 
-But AI reawakened my desire to experiment. I needed a functioning Linux system and, after 15 years, I installed **Linux Mint**. I was struck: the Linux world had become simple, elegant, beautiful. Thanks to AI, I didn't have to reread tons of documentation for drivers and services; in two days, I had a perfect workstation.
+AI, however, also rekindled the desire to experiment. I needed a working Linux system and, after 15 years, I installed **Linux Mint**. The gap with what I remembered was evident: the Linux world had become simple and elegant. With AI's help I did not have to reread entire manuals for drivers and services; in two days I had a fully working workstation.
 
-## **The Escalation: From the VM to the Mini PC**
+## **From the VM to the Mini PC**
 
-At that point, curiosity became unstoppable. I wanted services active 24/7. I rented a VM, using it as a training ground with AI as a "Senior Partner" always by my side.
+At that point curiosity had become an operational necessity: I wanted services running 24/7. I rented a VM and used it as a test environment, with AI as a technical senior partner at my side.
 
-But the services grew: **Docker, SQL and NoSQL databases, vector databases for LLMs, n8n for automation, Tailscale for the network...** The rented server was no longer enough. Instead of increasing the monthly fee, I made the leap: I bought a **Mini PC** with enough RAM, a domain, and started building my homelab.
+The services, however, kept growing: **Docker, SQL and NoSQL databases, vector databases for LLMs, n8n for automation, Tailscale for the network.** The rented server was no longer enough. Instead of raising the monthly fee I made the leap: I bought a **Mini PC** with enough RAM, got a domain and started building my homelab.
 
-## **Beyond Fear: Proxmox and Kubernetes**
+## **Proxmox and Kubernetes**
 
-With AI supporting me, the "fear of complexity" vanished. Why read 300 pages of manual when AI can extract the exact 10 lines I need at that moment?
+With AI at hand, the fear of complexity weighed less: reading three hundred pages of a manual to find the ten useful lines was no longer the only way to proceed.
 
-So I installed **Proxmox**. Then, I told myself: *"Why stop?"*. I faced the ultimate challenge: **Kubernetes**. Perhaps it is excessive for a home laboratory, but the subject is too fascinating to be ignored. Today my Home Lab runs on a Kubernetes cluster with **Talos Linux** on Proxmox.
+I installed **Proxmox** and then took on **Kubernetes**, the most demanding part of the laboratory. For a home environment it may look disproportionate, but the subject deserved to be studied hands-on. Today my homelab runs on a Kubernetes cluster with **Talos Linux** on Proxmox.
 
-## **Conclusion: Un New World to Explore**
+## **Conclusion: A Path Still Open**
 
-Who am I today? A physicist who saw the birth of AI and who today uses it to break down time barriers. I don't know where this road made of **High Availability, security, and scalability** will lead me, but I know that in front of me is a new world to explore.
+Who am I today? A physicist who saw AI being born and who today uses it to reduce the time spent studying and working. I do not know where this road of **high availability, security and scalability** will lead; I know that ahead there is still a great deal to explore.
 
-I can't wait to discover what's behind the next node.
+The next node is already at the top of the list.
 
-*Did you enjoy this journey? Follow me on [blog.tazlab.net](http://blog.tazlab.net) to discover how I am configuring my cluster and what the next experiments on the border between physics and cloud are.*
+*The articles on [blog.tazlab.net](http://blog.tazlab.net) document how I am configuring the cluster and which experiments follow, on the border between physics and cloud.*
