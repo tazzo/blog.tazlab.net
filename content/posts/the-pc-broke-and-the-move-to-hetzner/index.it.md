@@ -25,35 +25,6 @@ Non si tratta di presunzione o di un colpo di fortuna: il risultato è la dirett
 
 ---
 
-## Fase 0: Triage dello stato reale e salvataggio a caldo
-
-Prima di avviare qualsiasi ricostruzione nel cloud, la priorità assoluta di un disaster recovery è distinguere ciò che è puramente effimero da ciò che è reale stato persistente. Se un elemento può essere ricostruito tramite codice o sincronizzato da Git, non va salvato; si salva solo ed esclusivamente ciò che non può essere generato nuovamente.
-
-La mappatura delle risorse ha confermato la solidità dell'architettura:
-
-| Componente | Tipologia di Stato | Strategia di Recupero |
-|---|---|---|
-| **Cluster Kubernetes (Talos)** | **Stateless** | Interamente definito nei repository Git (`tazlab-k8s` e `ephemeral-castle`). Zero dati unici sui dischi locali. |
-| **Vault (Gestore Segreti)** | **Indipendente** | Già collocato preventivamente su una VPS Hetzner esterna; non risiedeva sulla macchina guasta. |
-| **Database Applicativo PostgreSQL** | **Ripristinabile** | Backup continui gestiti da pgBackRest su bucket S3 compatibile. |
-| **Ambrogio + Ambrogio Memory** | **Stato Reale** | Due database SQLite locali (`ambrogio.db` e `memory.db`, circa 135 MB) ospitati in container LXC. |
-| **ADA (Casa degli Agenti)** | **Stato Reale** | Database `agent.sqlite` (450 MB) e configurazioni operative. |
-| **21 Repository Git Locali** | **Audit di Coerenza** | Verifica immediata di commit locali non ancora inviati ai remote su GitHub. |
-
-Sfruttando le brevi finestre in cui il PC riusciva a rimanere acceso prima di raggiungere le temperature critiche, abbiamo eseguito la sequenza di salvataggio in ordine rigoroso di priorità:
-
-1. **Estrazione degli archivi utente:** Creazione rapida di tarball per le home dei container LXC contenenti i binari e i dati di Ambrogio, Memory e ADA.
-2. **Audit e bundle Git:** Il controllo su 21 repository ha svelato una sorpresa insidiosa. Se la maggior parte dei progetti era allineata con GitHub, tre repository erano avanti: `tazpod` (+1 commit), `tazlab-secrets` (+16 commit) e soprattutto **`ada` con ben 125 commit non pushati**. Il container di Ada era stato configurato internamente con un repository bare locale e non aveva mai sincronizzato le modifiche sul remote GitHub. Abbiamo salvato immediatamente i bundle completi per evitare perdite catastrofiche di codice.
-3. **Backup transazionale dei database SQLite:** Un errore frequente in situazioni di emergenza è copiare file di database mentre i motori sono ancora in esecuzione (`cp db.sqlite`). Con il motore SQLite in modalità WAL (Write-Ahead Logging), una copia a caldo genera file corrotti o inconsistenti. Il nostro primo tentativo a motore attivo ha mostrato una discrepanza tra record letti (`entries 22016` contro `22020`). Abbiamo quindi fermato ordinatamente i servizi ed eseguito il backup tramite comando atomico:
-   ```bash
-   sqlite3 memory.db ".backup memory-2026-10-27-final.sqlite"
-   sqlite3 ambrogio.db ".backup ambrogio-final.sqlite"
-   ```
-   L'integrità è stata verificata immediatamente (`PRAGMA integrity_check;`) con sha256 verificato.
-4. **Spegnimento forzato:** Fermati i container, la macchina è stata spenta definitivamente con `systemctl --force poweroff`. Da quel momento in poi, l'hardware di casa non è più stato toccato.
-
----
-
 ## Fase 1: Il collo di bottiglia di Terraform e la posa del nuovo terreno
 
 La filosofia del Castello Effimero stabilisce una rigorosa **Division of Labour** (divisione dei compiti):
@@ -163,11 +134,9 @@ Tutti i servizi del laboratorio sono tornati pienamente operativi nel cloud, con
 
 Un incidente hardware improvviso è il test più spietato a cui possa essere sottoposta un'infrastruttura. Quando la macchina locale ha ceduto, non c'è stato spazio per improvvisazioni o correzioni manuali disperate: il sistema ha risposto esattamente come era stato progettato per rispondere.
 
-Da questa esperienza emergono quattro lezioni fondamentali:
+Da questa esperienza emergono due lezioni fondamentali:
 
 1. **Il disaccoppiamento IaC/GitOps è una polizza assicurativa:** Separare Terraform (il terreno) da Flux (le mura del castello) ha impedito il disastro. Avere un repository applicativo (`tazlab-k8s`) completamente agnostico rispetto all'hardware ha consentito di rimontare ventisei servizi complessi in pochi minuti netti dal momento in cui i nodi cloud sono diventati disponibili.
 2. **Il debito tecnico si paga nel momento peggiore:** L'unica ragione per cui l'intervento ha richiesto due ore invece di quindici minuti è che lo strato Terraform per Hetzner non era stato rifinito in tempo di pace. Mantenere l'allineamento dei moduli di provisioning per tutti i target previsti è indispensabile per garantire un failover trasparente.
-3. **I file SQLite richiedono disciplina atomica:** Copiare file di database attivi durante un guasto espone al rischio concreto di corruzione del dato. L'uso metodico di `sqlite3 .backup` e la verifica immediata di integrità hanno preservato mesi di memoria storica e conversazioni degli agenti.
-4. **Git è il vero archivio dello stato:** L'audit preventivo prima del poweroff ha evitato la perdita di 125 commit di codice confinati in un repository bare locale. In un'architettura distribuita, un commit non spinto su un remote affidabile è un commit che non esiste.
 
 Il Castello Effimero ha dimostrato sul campo la validità del suo principio ispiratore: le macchine fisiche muoiono, ma l'infrastruttura governata dal codice rinasce sempre.
