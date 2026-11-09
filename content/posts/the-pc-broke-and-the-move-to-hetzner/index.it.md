@@ -1,7 +1,7 @@
 +++
 title = "Il PC si spegne, il Castello risorge: migrare il cluster Kubernetes su Hetzner in due ore"
 date = 2026-10-28T12:00:00+02:00
-draft = true
+draft = false
 description = "Cronaca tecnica di un disastro hardware annunciato: quando la macchina fisica del laboratorio ha ceduto per surriscaldamento, la promessa del Castello Effimero è passata dalla teoria ai fatti. Come la separazione netta tra Terraform e Flux ha permesso la rinascita del cluster su Hetzner in sole due ore."
 tags = ["kubernetes", "gitops", "fluxcd", "terraform", "hetzner", "disaster-recovery", "vault", "talos"]
 author = "Tazzo"

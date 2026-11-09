@@ -1,7 +1,7 @@
 +++
 title = "The PC Shuts Down, the Castle Rises: Migrating the Kubernetes Cluster to Hetzner in Two Hours"
 date = 2026-10-28T12:00:00+02:00
-draft = true
+draft = false
 description = "Technical chronicle of an expected hardware failure: when the local lab machine gave way to overheating, the promise of the Ephemeral Castle moved from theory to practice. How the clean separation between Terraform and Flux enabled the rebirth of the cluster on Hetzner in just two hours."
 tags = ["kubernetes", "gitops", "fluxcd", "terraform", "hetzner", "disaster-recovery", "vault", "talos"]
 author = "Tazzo"
